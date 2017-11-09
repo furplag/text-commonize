@@ -18,7 +18,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>jp.furplag.sandbox.java.util</groupId>
+  <groupId>jp.furplag.sandbox</groupId>
   <artifactId>text-commonize</artifactId>
   <version>1.0.0</version>
   <inceptionYear>2017</inceptionYear>
@@ -67,6 +67,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>jp.furplag.sandbox.java.util</groupId>
+      <artifactId>savage-reflections</artifactId>
+      <version>1.0.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -134,7 +140,7 @@
           <artifactId>coveralls-maven-plugin</artifactId>
           <version>4.3.0</version>
           <configuration>
-              <repoToken>${coveralls.cjk-normalize.repoToken}</repoToken>
+              <repoToken>${coveralls.text-commonize.repoToken}</repoToken>
           </configuration>
       </plugin>
 
@@ -151,12 +157,7 @@
           <excludes>
             <exclude>**/.licenseHeader</exclude>
             <exclude>**/LICENSE</exclude>
-            <exclude>**/*.yaml</exclude>
-            <exclude>**/*.yml</exclude>
-            <exclude>**/.codebeatignore</exclude>
-            <exclude>**/.editorconfig</exclude>
-            <exclude>src/test/resources/**</exclude>
-            <exclude>src/main/resources/**</exclude>
+            <exclude>**/.*</exclude>
           </excludes>
         </configuration>
         <executions>
