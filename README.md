@@ -2,6 +2,9 @@
 
 [![Build Status](https://travis-ci.org/furplag/text-commonize.svg?branch=master)](https://travis-ci.org/furplag/text-commonize)
 [![Coverage Status](https://coveralls.io/repos/github/furplag/text-commonize/badge.svg?branch=master)](https://coveralls.io/github/furplag/text-commonize?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/49feeef5102c4e45a8931b09feed4abd)](https://www.codacy.com/app/furplag/text-commonize?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=furplag/text-commonize&amp;utm_campaign=Badge_Grade)
+[![codebeat badge](https://codebeat.co/badges/15c40392-e0a7-4d67-955b-9565c78e36c6)](https://codebeat.co/projects/github-com-furplag-text-commonize-master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/39a4c2be5b1aeac0e685/maintainability)](https://codeclimate.com/github/furplag/text-commonize/maintainability)
 
 optimized Unicode normalization for using under standard input text.
 
