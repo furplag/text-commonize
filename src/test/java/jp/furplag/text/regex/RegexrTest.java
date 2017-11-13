@@ -38,12 +38,12 @@ public class RegexrTest {
   @Test
   public void test() {
     // @formatter:off
-    assertThat(new Regexr(null,  null) {public int order() {return 0;}} instanceof Regexr, is(true));
+    assertThat(new Regexr(null,  null, 0){} instanceof Regexr, is(true));
 
-    Regexr one = new Regexr("one",  "壱") {public int order() {return 1;}};
-    Regexr two = new Regexr("two",  "弐") {public int order() {return 2;}};
-    Regexr three = new Regexr("three",  "参") {public int order() {return 3;}};
-    Regexr minus = new Regexr("minus",  "▲壱") {public int order() {return -1;}};
+    Regexr one = new Regexr("one",  "壱", 1) {};
+    Regexr two = new Regexr("two",  "弐", 2) {};
+    Regexr three = new Regexr("three",  "参", 3) {};
+    Regexr minus = new Regexr("minus",  "▲壱", -1) {};
     // @formatter:on
 
     assertThat(Arrays.asList(null, two, one, three, minus).stream().toArray(), is(new RegexrOrigin[] {null, two, one, three, minus}));
@@ -79,58 +79,26 @@ public class RegexrTest {
       }
     }), is(false));
     assertThat(one.equals(two), is(false));
-    assertThat(one.equals(new Regexr("one", "1") {
-      public int order() {
-        return 1;
-      }
-    }), is(false));
+    assertThat(one.equals(new Regexr("one", "1", 1) {}), is(false));
     assertThat(one == two, is(false));
     RegexrOrigin anotherOne = one;
     assertThat(one == anotherOne, is(true));
-    assertThat(one == new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }, is(false));
+    assertThat(one == new Regexr("one", "壱", 1) {}, is(false));
     assertThat(one.equals(one), is(true));
-    assertThat(one.equals(new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }), is(true));
-    assertThat(one.equals(new Regexr("one", "壱") {
-      public int order() {
-        return -100;
-      }
-    }), is(true));
+    assertThat(one.equals(new Regexr("one", "壱", 1) {}), is(true));
+    assertThat(one.equals(new Regexr("one", "壱", 1) {}), is(true));
 
     assertThat(one.hashCode() == two.hashCode(), is(false));
-    assertThat(one.hashCode() == new Regexr("one", "1") {
-      public int order() {
-        return 1;
-      }
-    }.hashCode(), is(false));
+    assertThat(one.hashCode() == new Regexr("one", "1", 1) {}.hashCode(), is(false));
     assertThat(one.hashCode() == anotherOne.hashCode(), is(true));
-    assertThat(one.hashCode() == new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }.hashCode(), is(true));
-    assertThat(one.hashCode() == new Regexr("one", "壱") {
-      public int order() {
-        return -100;
-      }
-    }.hashCode(), is(true));
+    assertThat(one.hashCode() == new Regexr("one", "壱", 1) {}.hashCode(), is(true));
+    assertThat(one.hashCode() == new Regexr("one", "壱", 1) {}.hashCode(), is(true));
 
     try {
-      assertThat(one.hashCode() == new Regexr("one", "壱") {
+      assertThat(one.hashCode() == new Regexr("one", "壱", -100) {
         {
           SavageReflection.set(this, Regexr.class.getDeclaredField("pattern"), null);
           SavageReflection.set(this, Regexr.class.getDeclaredField("replacement"), null);
-        }
-
-        public int order() {
-          return -100;
         }
       }.hashCode(), is(false));
     } catch (Exception e) {
@@ -140,264 +108,64 @@ public class RegexrTest {
 
   @Test
   public void testMatches() {
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches(null), is(false));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches(""), is(false));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("1"), is(false));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("o ne"), is(false));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("One"), is(false));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("\t\t\to\tne\t\t\t"), is(false));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("\t\t\to\nne\t\t\t"), is(false));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("one"), is(true));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("one two three"), is(true));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("three two one zero"), is(true));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("three\ntwo\none\nzero"), is(true));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("oneoneoneoneone"), is(true));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("neoneoneoneoneo"), is(true));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("\t\t\tone\t\t\t"), is(true));
-    assertThat((new Regexr("o\\s?n\\s?e", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("\t\t\to\nne\t\t\t"), is(true));
-    assertThat((new Regexr("o\\s*n\\s*e", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).matches("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"), is(true));
+    assertThat((new Regexr("one", "壱", 1) {}).matches(null), is(false));
+    assertThat((new Regexr("one", "壱", 1) {}).matches(""), is(false));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("1"), is(false));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("o ne"), is(false));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("One"), is(false));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("\t\t\to\tne\t\t\t"), is(false));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("\t\t\to\nne\t\t\t"), is(false));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("one"), is(true));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("one two three"), is(true));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("three two one zero"), is(true));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("three\ntwo\none\nzero"), is(true));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("oneoneoneoneone"), is(true));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("neoneoneoneoneo"), is(true));
+    assertThat((new Regexr("one", "壱", 1) {}).matches("\t\t\tone\t\t\t"), is(true));
+    assertThat((new Regexr("o\\s?n\\s?e", "壱", 1) {}).matches("\t\t\to\nne\t\t\t"), is(true));
+    assertThat((new Regexr("o\\s*n\\s*e", "壱", 1) {}).matches("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"), is(true));
   }
 
   @Test
   public void testFind() {
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find(null), is(new ArrayList<>()));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find(""), is(new ArrayList<>()));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("1"), is(new ArrayList<>()));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("o ne"), is(new ArrayList<>()));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("One"), is(new ArrayList<>()));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("\t\t\to\tne\t\t\t"), is(new ArrayList<>()));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("\t\t\to\nne\t\t\t"), is(new ArrayList<>()));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("one"), is(Arrays.asList("one")));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("one two three"), is(Arrays.asList("one")));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("three two one zero"), is(Arrays.asList("one")));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("three\ntwo\none\nzero"), is(Arrays.asList("one")));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("oneoneoneoneone"), is(Arrays.asList("one", "one", "one", "one", "one")));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("neoneoneoneoneo"), is(Arrays.asList("one", "one", "one", "one")));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("\t\t\tone\t\t\t"), is(Arrays.asList("one")));
-    assertThat((new Regexr("o\\s?n\\s?e", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("\t\t\to\nne\t\t\t"), is(Arrays.asList("o\nne")));
-    assertThat((new Regexr("o\\s*n\\s*e", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"), is(Arrays.asList("o\nn\t\t\t\n\t\t\te")));
-    assertThat((new Regexr("[one]", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).find("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"), is(Arrays.asList("o", "n", "e")));
+    assertThat((new Regexr("one", "壱", 1) {}).find(null), is(new ArrayList<>()));
+    assertThat((new Regexr("one", "壱", 1) {}).find(""), is(new ArrayList<>()));
+    assertThat((new Regexr("one", "壱", 1) {}).find("1"), is(new ArrayList<>()));
+    assertThat((new Regexr("one", "壱", 1) {}).find("o ne"), is(new ArrayList<>()));
+    assertThat((new Regexr("one", "壱", 1) {}).find("One"), is(new ArrayList<>()));
+    assertThat((new Regexr("one", "壱", 1) {}).find("\t\t\to\tne\t\t\t"), is(new ArrayList<>()));
+    assertThat((new Regexr("one", "壱", 1) {}).find("\t\t\to\nne\t\t\t"), is(new ArrayList<>()));
+    assertThat((new Regexr("one", "壱", 1) {}).find("one"), is(Arrays.asList("one")));
+    assertThat((new Regexr("one", "壱", 1) {}).find("one two three"), is(Arrays.asList("one")));
+    assertThat((new Regexr("one", "壱", 1) {}).find("three two one zero"), is(Arrays.asList("one")));
+    assertThat((new Regexr("one", "壱", 1) {}).find("three\ntwo\none\nzero"), is(Arrays.asList("one")));
+    assertThat((new Regexr("one", "壱", 1) {}).find("oneoneoneoneone"), is(Arrays.asList("one", "one", "one", "one", "one")));
+    assertThat((new Regexr("one", "壱", 1) {}).find("neoneoneoneoneo"), is(Arrays.asList("one", "one", "one", "one")));
+    assertThat((new Regexr("one", "壱", 1) {}).find("\t\t\tone\t\t\t"), is(Arrays.asList("one")));
+    assertThat((new Regexr("o\\s?n\\s?e", "壱", 1) {}).find("\t\t\to\nne\t\t\t"), is(Arrays.asList("o\nne")));
+    assertThat((new Regexr("o\\s*n\\s*e", "壱", 1) {}).find("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"), is(Arrays.asList("o\nn\t\t\t\n\t\t\te")));
+    assertThat((new Regexr("[one]", "壱", 1) {}).find("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"), is(Arrays.asList("o", "n", "e")));
   }
 
   @Test
   public void testReplaceAll() {
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll(null), is((String) null));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll(""), is(""));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("1"), is("1"));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("o ne"), is("o ne"));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("One"), is("One"));
-    assertThat((new Regexr("[Oo]ne", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("One"), is("壱"));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("\t\t\to\tne\t\t\t"), is("\t\t\to\tne\t\t\t"));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("\t\t\to\nne\t\t\t"), is("\t\t\to\nne\t\t\t"));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("one"), is("壱"));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("one two three"), is("壱 two three"));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("three two one zero"), is("three two 壱 zero"));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("three\ntwo\none\nzero"), is("three\ntwo\n壱\nzero"));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("oneoneoneoneone"), is("壱壱壱壱壱"));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("neoneoneoneoneo"), is("ne壱壱壱壱o"));
-    assertThat((new Regexr("one", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("\t\t\tone\t\t\t"), is("\t\t\t壱\t\t\t"));
-    assertThat((new Regexr("o\\s?n\\s?e", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("\t\t\to\nne\t\t\t"), is("\t\t\t壱\t\t\t"));
-    assertThat((new Regexr("o\\s*n\\s*e", "壱") {
-      public int order() {
-        return 1;
-      }
-    }).replaceAll("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"), is("\t\t\t壱\t\t\t"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll(null), is((String) null));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll(""), is(""));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("1"), is("1"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("o ne"), is("o ne"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("One"), is("One"));
+    assertThat((new Regexr("[Oo]ne", "壱", 1) {}).replaceAll("One"), is("壱"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("\t\t\to\tne\t\t\t"), is("\t\t\to\tne\t\t\t"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("\t\t\to\nne\t\t\t"), is("\t\t\to\nne\t\t\t"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("one"), is("壱"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("one two three"), is("壱 two three"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("three two one zero"), is("three two 壱 zero"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("three\ntwo\none\nzero"), is("three\ntwo\n壱\nzero"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("oneoneoneoneone"), is("壱壱壱壱壱"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("neoneoneoneoneo"), is("ne壱壱壱壱o"));
+    assertThat((new Regexr("one", "壱", 1) {}).replaceAll("\t\t\tone\t\t\t"), is("\t\t\t壱\t\t\t"));
+    assertThat((new Regexr("o\\s?n\\s?e", "壱", 1) {}).replaceAll("\t\t\to\nne\t\t\t"), is("\t\t\t壱\t\t\t"));
+    assertThat((new Regexr("o\\s*n\\s*e", "壱", 1) {}).replaceAll("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"), is("\t\t\t壱\t\t\t"));
   }
 
   @Test

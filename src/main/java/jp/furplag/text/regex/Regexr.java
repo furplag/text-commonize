@@ -1,17 +1,18 @@
 /**
  * Copyright (C) 2017+ furplag (https://github.com/furplag)
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package jp.furplag.text.regex;
 
 import java.io.Serializable;
@@ -33,39 +34,19 @@ import java.util.regex.Pattern;
 public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<RegexrOrigin> {
 
   /** remove Control Character. */
-  public static final Regexr CtrlRemovr = new RegexrStandard("[\\p{Cc}&&[^\\s\\x{001C}-\\x{001F}]]", "");
+  public static final Regexr CtrlRemovr = new RegexrStandard("[\\p{Cc}&&[^\\s\\x{001C}-\\x{001F}]]", "", 0);
 
   /** replace whitespaces to space. */
-  public static final Regexr SpaceNormalizr = new RegexrStandard("[\\p{javaWhitespace}&&[^\\x{000A}\\x{0020}]]", "\u0020") {
-    @Override
-    public int order() {
-      return 10;
-    }
-  };
+  public static final Regexr SpaceNormalizr = new RegexrStandard("[\\p{javaWhitespace}&&[^\\x{000A}\\x{0020}]]", "\u0020", 10);
 
   /** replace a sequence of spaces with a single spaces. */
-  public static final Regexr SpaceLintr = new RegexrRecursive("[\\p{javaWhitespace}&&[^\\x{000A}]]{2,}", "\u0020") {
-    @Override
-    public int order() {
-      return 100;
-    }
-  };
+  public static final Regexr SpaceLintr = new RegexrRecursive("[\\p{javaWhitespace}&&[^\\x{000A}]]{2,}", "\u0020", 100);
 
   /** remove empty rows. */
-  public static final Regexr LinefeedLintr = new RegexrRecursive("\\s+\\n|\\n\\s+", "\n") {
-    @Override
-    public int order() {
-      return 1000;
-    }
-  };
+  public static final Regexr LinefeedLintr = new RegexrRecursive("\\s+\\n|\\n\\s+", "\n", 1_000);
 
   /** remove leading and trailing space. */
-  public static final Regexr Trimr = new RegexrStandard("^[\\p{javaWhitespace}]+|[\\p{javaWhitespace}]+$", "") {
-    @Override
-    public int order() {
-      return 10000;
-    }
-  };
+  public static final Regexr Trimr = new RegexrStandard("^[\\p{javaWhitespace}]+|[\\p{javaWhitespace}]+$", "", 10_000);
 
   /**
    * modified normalization for CJK text .
@@ -80,7 +61,7 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
    * </ul>
    *
    */
-  public static final Regexr CjkNormalizr = new Regexr("([\uFF00-\uFFEF]+)", "$1") {
+  public static final Regexr CjkNormalizr = new Regexr("([\uFF00-\uFFEF]+)", "$1", 100_000) {
     @Override
     public String replaceAll(String string) {
       if (RegexrOrigin.isEmpty(string))
@@ -94,11 +75,6 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
 
       return result.replaceAll("\u0020?([\u3099])", "\u309B").replaceAll("\u0020?([\u309A])", "\u309C");
     }
-
-    @Override
-    public int order() {
-      return 100000;
-    }
   };
 
   /** regular expression compiled into a pattern */
@@ -107,15 +83,19 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
   /** the replacement string */
   protected final String replacement;
 
+  /** the replacement string */
+  protected final int order;
+
   /**
    * shorthand for {@code Pattern.compile(regex).matcher(text).replaceAll(replacement)}.
    *
    * @param regex the regular expression
    * @param replacement The replacement string, set empty string if this parameter is null
    */
-  protected Regexr(String regex, String replacement) {
+  protected Regexr(String regex, String replacement, int order) {
     this.pattern = Pattern.compile(Objects.toString(regex, "^\\x{0000}$"));
     this.replacement = Objects.toString(replacement, "");
+    this.order = order < 0 ? 0 : order;
   }
 
   /**
@@ -151,8 +131,8 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
   }
 
   @Override
-  public int order() {
-    return 0;
+  public final int order() {
+    return order;
   }
 
   @Override

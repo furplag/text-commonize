@@ -42,10 +42,10 @@ public final class Hiraganizr extends StandardNormalizr {
     super(
       null
     , new Regexr[]{
-        new RegexrStandard("\\x{30F7}", "\u308F\u309B"){@Override public int order() {return 100;}}
-      , new RegexrStandard("\\x{30F8}", "\u3090\u309B"){@Override public int order() {return 100;}}
-      , new RegexrStandard("\\x{30F9}", "\u3091\u309B"){@Override public int order() {return 100;}}
-      , new RegexrStandard("\\x{30FA}", "\u3092\u309B"){@Override public int order() {return 100;}}
+        new RegexrStandard("\\x{30F7}", "\u308F\u309B", 100)
+      , new RegexrStandard("\\x{30F8}", "\u3090\u309B", 100)
+      , new RegexrStandard("\\x{30F9}", "\u3091\u309B", 100)
+      , new RegexrStandard("\\x{30FA}", "\u3092\u309B", 100)
       }
     , Arrays.asList(12448, 12535, 12536, 12537, 12538, 12539, 12540, 12543).stream().map(Integer::valueOf).collect(Collectors.toSet()));
     // @formatter:on

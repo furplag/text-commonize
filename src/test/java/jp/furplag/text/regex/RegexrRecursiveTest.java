@@ -31,9 +31,7 @@ public class RegexrRecursiveTest {
 
   @Test
   public void test() {
-    assertThat(new RegexrRecursive(null, null), is(new RegexrRecursive(null, null){
-      @Override public int order() {return 0;}
-    }));
+    assertThat(new RegexrRecursive(null, null), is(new RegexrRecursive(null, null)));
 
     assertThat(new RegexrRecursive(null, null).order(), is(0));
   }

@@ -28,9 +28,7 @@ public class RegexrStandardTest {
 
   @Test
   public void test() {
-    assertThat(new RegexrStandard(null, null), is(new Regexr(null, null){
-      @Override public int order() {return 0;}
-    }));
+    assertThat(new RegexrStandard(null, null), is(new Regexr(null, null, 0){}));
 
     assertThat(new RegexrStandard(null, null).order(), is(0));
   }

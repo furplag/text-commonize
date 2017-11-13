@@ -25,6 +25,10 @@ package jp.furplag.text.regex;
 public class RegexrStandard extends Regexr {
 
   public RegexrStandard(String regex, String replacement) {
-    super(regex, replacement);
+    super(regex, replacement, 0);
+  }
+
+  public RegexrStandard(String regex, String replacement, int order) {
+    super(regex, replacement, order);
   }
 }

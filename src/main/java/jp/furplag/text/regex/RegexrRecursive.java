@@ -27,7 +27,11 @@ import java.util.regex.Matcher;
 public class RegexrRecursive extends Regexr {
 
   public RegexrRecursive(String regex, String replacement) {
-    super(regex, replacement);
+    super(regex, replacement, 0);
+  }
+
+  public RegexrRecursive(String regex, String replacement, int order) {
+    super(regex, replacement, order);
   }
 
   /**
