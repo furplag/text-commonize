@@ -17,6 +17,8 @@
 package jp.furplag.text.regex;
 
 import java.io.Serializable;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -47,6 +49,18 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
   /** remove leading and trailing space. */
   public static final Regexr Trimr;
 
+  /**
+   * modified normalization for CJK text .
+   *
+   * <p>normalize the character member of Halfwidth and Fullwidth Forms uning {@link Form#NFKC}.</p>
+   * <ul>
+   * <li>CJK half width character replace to full width mostly ( Hangul, Katakana, Hiragana ) .</li>
+   * <li>CJK full width character replace to Latin or single byte character, if those are convertible.</li>
+   * </ul>
+   *
+   */
+  public static final Regexr CjkNormalizr;
+
   static {
     // @formatter:off
     CtrlRemovr = new RegexrStandard("[\\p{Cc}&&[^\\s\\x{001C}-\\x{001F}]]", "");
@@ -54,6 +68,22 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
     SpaceLintr = new RegexrRecursive("[\\p{javaWhitespace}&&[^\\x{000A}]]{2,}", "\u0020") {@Override public int order() {return 100;}};
     LinefeedLintr = new RegexrRecursive("\\s+\\n|\\n\\s+", "\n") {@Override public int order() {return 1000;}};
     Trimr = new RegexrStandard("^[\\p{javaWhitespace}]+|[\\p{javaWhitespace}]+$", "") {@Override public int order() {return 10000;}};
+
+    CjkNormalizr = new Regexr("([\uFF00-\uFFEF]+)", "$1") {
+      @Override
+      public String replaceAll(String string) {
+        if (RegexrOrigin.isEmpty(string)) return string;
+        String result = string;
+        Matcher matcher = pattern.matcher(result);
+        while (matcher.find()) {
+          String matched = matcher.group();
+          result = result.replace(matched, Normalizer.normalize(matched, Form.NFKC));
+        }
+
+        return result.replaceAll("\u0020?([\u3099])", "\u309B").replaceAll("\u0020?([\u309A])", "\u309C");
+      }
+      @Override public int order() {return 100000;}
+    };
     // @formatter:on
   }
 

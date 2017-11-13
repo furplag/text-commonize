@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jp.furplag.text.regex;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.lang.Character.UnicodeBlock;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,10 +31,6 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
-import jp.furplag.text.regex.Regexr;
-import jp.furplag.text.regex.RegexrOrigin;
-import jp.furplag.text.regex.RegexrRecursive;
-import jp.furplag.text.regex.RegexrStandard;
 import jp.furplag.util.reflect.SavageReflection;
 
 public class RegexrTest {
@@ -408,11 +406,11 @@ public class RegexrTest {
     assertThat(Regexr.CtrlRemovr.order(), is(0));
 
     String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String ctrlsR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s->Regexr.CtrlRemovr.pattern.matcher(s).matches()).collect(Collectors.joining());
+    String ctrlsR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.CtrlRemovr.pattern.matcher(s).matches()).collect(Collectors.joining());
     assertThat(ctrlsR.codePoints().toArray(), is(ctrls.codePoints().toArray()));
     assertThat(ctrlsR, is(ctrls));
-    assertThat(Regexr.CtrlRemovr.replaceAll(ctrls) , is(""));
-    assertThat(Regexr.CtrlRemovr.replaceAll(ctrlsR) , is(""));
+    assertThat(Regexr.CtrlRemovr.replaceAll(ctrls), is(""));
+    assertThat(Regexr.CtrlRemovr.replaceAll(ctrlsR), is(""));
 
     final String string = "PrettyfyMe.";
     String uglified = "";
@@ -464,11 +462,11 @@ public class RegexrTest {
     assertThat(Regexr.SpaceNormalizr.order(), is(10));
 
     String spaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).filter(codePoint -> codePoint != 0x000A && codePoint != 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String spacesR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s->Regexr.SpaceNormalizr.pattern().matcher(s).matches()).collect(Collectors.joining());
+    String spacesR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.SpaceNormalizr.pattern().matcher(s).matches()).collect(Collectors.joining());
     assertThat(spacesR.codePoints().toArray(), is(spaces.codePoints().toArray()));
     assertThat(spacesR, is(spaces));
-    assertThat(Regexr.SpaceNormalizr.replaceAll(spaces) , is(spaces.replaceAll("\\p{javaWhitespace}", " ")));
-    assertThat(Regexr.SpaceNormalizr.replaceAll(spacesR) , is(spacesR.replaceAll("\\p{javaWhitespace}", " ")));
+    assertThat(Regexr.SpaceNormalizr.replaceAll(spaces), is(spaces.replaceAll("\\p{javaWhitespace}", " ")));
+    assertThat(Regexr.SpaceNormalizr.replaceAll(spacesR), is(spacesR.replaceAll("\\p{javaWhitespace}", " ")));
 
     final String string = "N o r m a l i z e m e .";
     String uglified = "";
@@ -516,8 +514,29 @@ public class RegexrTest {
   }
 
   @Test
+  public void testCjkNormalizr() {
+    assertThat(Regexr.CjkNormalizr.order(), is(100000));
+    assertThat(Regexr.CjkNormalizr.replaceAll(null), is((String) null));
+    assertThat(Regexr.CjkNormalizr.replaceAll(""), is(""));
+
+    String halfwidthAndFullwidthForms = IntStream.rangeClosed(0, 200_000).filter(codePoint -> UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS.equals(UnicodeBlock.of(codePoint))).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String halfwidthAndFullwidthFormsR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.CjkNormalizr.pattern.matcher(s).matches()).collect(Collectors.joining());
+    assertThat(halfwidthAndFullwidthForms, is(halfwidthAndFullwidthFormsR));
+    assertThat(halfwidthAndFullwidthForms.codePoints().toArray(), is(halfwidthAndFullwidthFormsR.codePoints().toArray()));
+
+    String uglified = IntStream.rangeClosed(0xFF00, 0xFFEF).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String expect = uglified.codePoints().mapToObj(RegexrOrigin::newString).map(s -> Normalizer.normalize(s, Form.NFKC).replaceAll("\u0020?([\u3099])", "\u309B").replaceAll("\u0020?([\u309A])", "\u309C")).collect(Collectors.joining());
+
+    assertThat(Regexr.CjkNormalizr.replaceAll(uglified), is(expect));
+
+    expect = "ァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロワワイエヲンヴカケヷイ゛エ゛ヺ";
+    String actual = Regexr.CjkNormalizr.replaceAll("ｧｱｨｲｩｳｪｴｫｵｶｶﾞｷｷﾞｸｸﾞｹｹﾞｺｺﾞｻｻﾞｼｼﾞｽｽﾞｾｾﾞｿｿﾞﾀﾀﾞﾁﾁﾞｯﾂﾂﾞﾃﾃﾞﾄﾄﾞﾅﾆﾇﾈﾉﾊﾊﾞﾊﾟﾋﾋﾞﾋﾟﾌﾌﾞﾌﾟﾍﾍﾞﾍﾟﾎﾎﾞﾎﾟﾏﾐﾑﾒﾓｬﾔｭﾕｮﾖﾗﾘﾙﾚﾛﾜﾜｲｴｦﾝｳﾞｶｹﾜﾞｲﾞｴﾞｦﾞ");
+    assertThat(actual, is(expect));
+  }
+
+  @Test
   public void testConstants() {
-    assertThat(new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr}, is(new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr}));
-    assertThat(RegexrOrigin.regexrs(new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr}).toArray(Regexr[]::new), is(new Regexr[] {Regexr.CtrlRemovr, Regexr.SpaceNormalizr, Regexr.SpaceLintr, Regexr.LinefeedLintr, Regexr.Trimr}));
+    assertThat(new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr, Regexr.CjkNormalizr}, is(new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr, Regexr.CjkNormalizr}));
+    assertThat(RegexrOrigin.regexrs(new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.CjkNormalizr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr}).toArray(Regexr[]::new), is(new Regexr[] {Regexr.CtrlRemovr, Regexr.SpaceNormalizr, Regexr.SpaceLintr, Regexr.LinefeedLintr, Regexr.Trimr, Regexr.CjkNormalizr}));
   }
 }

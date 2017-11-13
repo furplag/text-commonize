@@ -154,6 +154,7 @@ public class NormalizrTest {
     assertThat(Normalizr.nfc(""), is(""));
     assertThat(Normalizr.nfd("バーバパパ"), is("バーバパパ"));
     assertThat(Normalizr.nfc("ハ゛ーハ゛ハ゜ハ゜"), is("ハ゛ーハ゛ハ゜ハ゜"));
+    assertThat(Normalizr.nfc("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
     assertThat(Normalizr.nfc("ワ゛ヰ゛ウ゛ヱ゛ヲ゛"), is("ワ゛ヰ゛ウ゛ヱ゛ヲ゛"));
     assertThat(Normalizr.nfc("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
     assertThat(Normalizr.nfc("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"), is("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"));
@@ -174,6 +175,7 @@ public class NormalizrTest {
     assertThat(Normalizr.nfd(""), is(""));
     assertThat(Normalizr.nfd("バーバパパ"), is("バーバパパ"));
     assertThat(Normalizr.nfd("ハ゛ーハ゛ハ゜ハ゜"), is("ハ゛ーハ゛ハ゜ハ゜"));
+    assertThat(Normalizr.nfd("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
     assertThat(Normalizr.nfd("ワ゛ヰ゛ウ゛ヱ゛ヲ゛"), is("ワ゛ヰ゛ウ゛ヱ゛ヲ゛"));
     assertThat(Normalizr.nfd("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
     assertThat(Normalizr.nfd("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"), is("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"));
