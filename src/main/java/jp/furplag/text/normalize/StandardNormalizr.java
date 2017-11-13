@@ -48,15 +48,14 @@ public abstract class StandardNormalizr extends Normalizr {
   protected static final Regexr[] standardPostNormalizr;
   static {
     standardPreNormalizr = new Regexr[]{
-      new RegexrStandard("\\x{FF5E}", "😵StandardNormalizr\u0023fullTilde😵\uFF5E😵StandardNormalizr\u0023fullTilde😵")
-    , new RegexrStandard("[\\x{2010}-\\x{2012}]", "\u002D")
-    , new RegexrStandard("\\x{0020}?[\\x{3099}\\x{309B}\\x{FF9E}]", "\uFF9E")
+      new RegexrStandard("\\x{0020}?[\\x{3099}\\x{309B}\\x{FF9E}]", "\uFF9E")
     , new RegexrStandard("\\x{0020}?[\\x{309A}\\x{309C}\\x{FF9F}]", "\uFF9F")
+    , new RegexrStandard("[\\x{2010}-\\x{2012}]", "\u002D")
+    , new RegexrStandard("\uFF5E", "\uFF00\u007E\uFF00")
     };
     standardPostNormalizr = new Regexr[]{
-      new RegexrStandard("\\x{1F635}StandardNormalizr\\x{0023}fullTilde\\x{1F635}\\x{007E}\\x{1F635}StandardNormalizr\\x{0023}fullTilde\\x{1F635}", "\uFF5E")
-    , new RegexrStandard("\\x{0020}?[\\x{3099}\\x{309B}\\x{FF9E}]", "\u309B")
-    , new RegexrStandard("\\x{0020}?[\\x{309A}\\x{309C}\\x{FF9F}]", "\u309C")
+      Regexr.CjkNormalizr
+    , new RegexrStandard("\uFF00\u007E\uFF00", "\uFF5E")
     };
   }
 

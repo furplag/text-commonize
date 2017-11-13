@@ -61,19 +61,28 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
    * </ul>
    *
    */
-  public static final Regexr CjkNormalizr = new Regexr("([\uFF00-\uFFEF]+)", "$1", 100_000) {
+  public static final Regexr CjkNormalizr = new Regexr("([\u3000-\u30FF\uFF00-\uFFEF&&[^\uFF5E\uFF04\uFFE0\uFFE1\uFFE5\uFFE6]]+)", "$1", 100_000) {
     @Override
     public String replaceAll(String string) {
-      if (RegexrOrigin.isEmpty(string))
+      // @formatter:off
+      if (RegexrOrigin.isEmpty(string)) {
         return string;
-      String result = string;
+      }
+      String result = string
+        .replaceAll("[\u2010-\u2012]", "\u002D")
+        .replaceAll("\u0020?[\u3099\u309B]", "\uFF9E")
+        .replaceAll("\u0020?[\u309A\u309C]", "\uFF9F")
+      ;
       Matcher matcher = pattern.matcher(result);
       while (matcher.find()) {
         String matched = matcher.group();
         result = result.replace(matched, Normalizer.normalize(matched, Form.NFKC));
       }
 
-      return result.replaceAll("\u0020?([\u3099])", "\u309B").replaceAll("\u0020?([\u309A])", "\u309C");
+      return result
+        .replaceAll("\u0020?([\u3099])", "\u309B")
+        .replaceAll("\u0020?([\u309A])", "\u309C");
+      // @formatter:on
     }
   };
 

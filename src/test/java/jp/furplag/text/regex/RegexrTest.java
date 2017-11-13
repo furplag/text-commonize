@@ -24,6 +24,7 @@ import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.function.IntPredicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -287,19 +288,55 @@ public class RegexrTest {
     assertThat(Regexr.CjkNormalizr.replaceAll(null), is((String) null));
     assertThat(Regexr.CjkNormalizr.replaceAll(""), is(""));
 
-    String halfwidthAndFullwidthForms = IntStream.rangeClosed(0, 200_000).filter(codePoint -> UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS.equals(UnicodeBlock.of(codePoint))).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    final Set<UnicodeBlock> unicodeBlocks = Arrays.asList(UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION, UnicodeBlock.HIRAGANA, UnicodeBlock.KATAKANA, UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS).stream().collect(Collectors.toSet());
+    final Set<Integer> excludes = Arrays.asList(0xFF04, 0xFF5E, 0xFFE0, 0xFFE1, 0xFFE5, 0xFFE6).stream().collect(Collectors.toSet());
+    String halfwidthAndFullwidthForms = IntStream.rangeClosed(0, 200_000).filter(codePoint -> unicodeBlocks.contains(UnicodeBlock.of(codePoint))).filter(codePoint->!excludes.contains(codePoint)).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
     String halfwidthAndFullwidthFormsR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.CjkNormalizr.pattern.matcher(s).matches()).collect(Collectors.joining());
     assertThat(halfwidthAndFullwidthForms, is(halfwidthAndFullwidthFormsR));
     assertThat(halfwidthAndFullwidthForms.codePoints().toArray(), is(halfwidthAndFullwidthFormsR.codePoints().toArray()));
 
     String uglified = IntStream.rangeClosed(0xFF00, 0xFFEF).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String expect = uglified.codePoints().mapToObj(RegexrOrigin::newString).map(s -> Normalizer.normalize(s, Form.NFKC).replaceAll("\u0020?([\u3099])", "\u309B").replaceAll("\u0020?([\u309A])", "\u309C")).collect(Collectors.joining());
+    // @formatter:off
+    String expect = uglified.codePoints()
+      .mapToObj(RegexrOrigin::newString)
+      .map(s -> Normalizer.normalize(s, Form.NFKC)
+        .replaceAll("\u0020?([\u3099])", "\u309B")
+        .replaceAll("\u0020?([\u309A])", "\u309C")
+        .replaceAll("\u007E", "\uFF5E")
+        .replaceAll("\\$", "\uFF04")
+        .replaceAll("\u00A2", "\uFFE0")
+        .replaceAll("\u00A3", "\uFFE1")
+        .replaceAll("\u00A5", "\uFFE5")
+        .replaceAll("\u20A9", "\uFFE6")
+      ).collect(Collectors.joining());
+
+    // @formatter:on
+    // 0xFF04, 0xFF5E, 0xFFE0, 0xFFE1, 0xFFE5, 0xFFE6
 
     assertThat(Regexr.CjkNormalizr.replaceAll(uglified), is(expect));
 
     expect = "ァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロワワイエヲンヴカケヷイ゛エ゛ヺ";
     String actual = Regexr.CjkNormalizr.replaceAll("ｧｱｨｲｩｳｪｴｫｵｶｶﾞｷｷﾞｸｸﾞｹｹﾞｺｺﾞｻｻﾞｼｼﾞｽｽﾞｾｾﾞｿｿﾞﾀﾀﾞﾁﾁﾞｯﾂﾂﾞﾃﾃﾞﾄﾄﾞﾅﾆﾇﾈﾉﾊﾊﾞﾊﾟﾋﾋﾞﾋﾟﾌﾌﾞﾌﾟﾍﾍﾞﾍﾟﾎﾎﾞﾎﾟﾏﾐﾑﾒﾓｬﾔｭﾕｮﾖﾗﾘﾙﾚﾛﾜﾜｲｴｦﾝｳﾞｶｹﾜﾞｲﾞｴﾞｦﾞ");
     assertThat(actual, is(expect));
+
+    expect = "ァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロワワイエヲンヴカケヷヸヹヺ";
+    assertThat(Regexr.CjkNormalizr.replaceAll(expect), is(expect));
+    assertThat(Regexr.CjkNormalizr.replaceAll(Normalizer.normalize(expect, Form.NFD) ), is(expect));
+
+    assertThat(Regexr.CjkNormalizr.replaceAll("Hello World."), is("Hello World."));
+    assertThat(Regexr.CjkNormalizr.replaceAll("Ｈｅｌｌｏ　Ｗｏｒｌｄ．"), is("Hello World."));
+    assertThat(Regexr.CjkNormalizr.replaceAll("こんにちは　世界"), is("こんにちは 世界"));
+    assertThat(Regexr.CjkNormalizr.replaceAll("ｺﾝﾆﾁﾊ　世界"), is("コンニチハ 世界"));
+    assertThat(Regexr.CjkNormalizr.replaceAll("コンニチハ　世界"), is("コンニチハ 世界"));
+    assertThat(Regexr.CjkNormalizr.replaceAll("バーバパパ"), is("バーバパパ"));
+    assertThat(Regexr.CjkNormalizr.replaceAll("ﾊﾞｰﾊﾞﾊﾟﾊﾟ"), is("バーバパパ"));
+    assertThat(Regexr.CjkNormalizr.replaceAll("ハ゛ーハ゛ハ゜ハ゜"), is("バーバパパ"));
+    assertThat(Regexr.CjkNormalizr.replaceAll("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
+    assertThat(Regexr.CjkNormalizr.replaceAll("ワ゛ヰ゛ウ゛ヱ゛ヲ゛"), is("ヷヸヴヹヺ"));
+    assertThat(Regexr.CjkNormalizr.replaceAll("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
+    assertThat(Regexr.CjkNormalizr.replaceAll("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"), is("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"));
+    assertThat(Regexr.CjkNormalizr.replaceAll("あ゚い゚う゚え゚お゚な゙に゙ぬ゙ね゙の゙"), is("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"));
+    assertThat(Regexr.CjkNormalizr.replaceAll("パ～やん"), is("パ～やん"));
   }
 
   @Test
