@@ -34,19 +34,19 @@ import java.util.regex.Pattern;
 public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<RegexrOrigin> {
 
   /** remove Control Character. */
-  public static final Regexr CtrlRemovr = new RegexrStandard("[\\p{Cc}&&[^\\s\\x{001C}-\\x{001F}]]", "", 0);
+  public static final Regexr CtrlRemovr;
 
   /** replace whitespaces to space. */
-  public static final Regexr SpaceNormalizr = new RegexrStandard("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", "\u0020", 10);
+  public static final Regexr SpaceNormalizr;
 
   /** replace a sequence of spaces with a single spaces. */
-  public static final Regexr SpaceLintr = new RegexrRecursive("[\\p{javaWhitespace}&&[^\\n]]{2,}", "\u0020", 100);
+  public static final Regexr SpaceLintr;
 
   /** remove empty rows. */
-  public static final Regexr LinefeedLintr = new RegexrRecursive("\\s+\\n|\\n\\s+", "\n", 1_000);
+  public static final Regexr LinefeedLintr;
 
   /** remove leading and trailing space. */
-  public static final Regexr Trimr = new RegexrStandard("^[\\p{javaWhitespace}]+|[\\p{javaWhitespace}]+$", "", 10_000);
+  public static final Regexr Trimr;
 
   /**
    * modified normalization for CJK text .
@@ -60,30 +60,39 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
    * </ul>
    *
    */
-  public static final Regexr CjkNormalizr = new Regexr("([\u3000-\u30FF\uFF00-\uFFEF&&[^\uFF5E\uFF04\uFFE0\uFFE1\uFFE5\uFFE6]]+)", "$1", 100_000) {
-    @Override
-    public String replaceAll(String string) {
-      // @formatter:off
-      if (RegexrOrigin.isEmpty(string)) {
-        return string;
-      }
-      String result = string
-        .replaceAll("[\u2010-\u2012]", "\u002D")
-        .replaceAll("\u0020?[\u3099\u309B]", "\uFF9E")
-        .replaceAll("\u0020?[\u309A\u309C]", "\uFF9F")
-      ;
-      Matcher matcher = pattern.matcher(result);
-      while (matcher.find()) {
-        String matched = matcher.group();
-        result = result.replace(matched, Normalizer.normalize(matched, Form.NFKC));
-      }
+  public static final Regexr CjkNormalizr;
 
-      return result
-        .replaceAll("\u0020?([\u3099])", "\u309B")
-        .replaceAll("\u0020?([\u309A])", "\u309C");
-      // @formatter:on
-    }
-  };
+  static {
+    CtrlRemovr = new RegexrStandard("[\\p{Cc}&&[^\\s\\x{001C}-\\x{001F}]]", "", 0);
+    SpaceNormalizr = new RegexrStandard("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", "\u0020", 10);
+    SpaceLintr = new RegexrRecursive("[\\p{javaWhitespace}&&[^\\n]]{2,}", "\u0020", 100);
+    LinefeedLintr = new RegexrRecursive("\\s+\\n|\\n\\s+", "\n", 1_000);
+    Trimr = new RegexrStandard("^[\\p{javaWhitespace}]+|[\\p{javaWhitespace}]+$", "", 10_000);
+    CjkNormalizr = new Regexr("([\u3000-\u30FF\uFF00-\uFFEF&&[^\uFF5E\uFF04\uFFE0\uFFE1\uFFE5\uFFE6]]+)", "$1", 100_000) {
+      @Override
+      public String replaceAll(String string) {
+        // @formatter:off
+        if (RegexrOrigin.isEmpty(string)) {
+          return string;
+        }
+        String result = string
+          .replaceAll("[\u2010-\u2012]", "\u002D")
+          .replaceAll("\u0020?[\u3099\u309B]", "\uFF9E")
+          .replaceAll("\u0020?[\u309A\u309C]", "\uFF9F")
+        ;
+        Matcher matcher = pattern.matcher(result);
+        while (matcher.find()) {
+          String matched = matcher.group();
+          result = result.replace(matched, Normalizer.normalize(matched, Form.NFKC));
+        }
+
+        return result
+          .replaceAll("\u0020?([\u3099])", "\u309B")
+          .replaceAll("\u0020?([\u309A])", "\u309C");
+        // @formatter:on
+      }
+    };
+  }
 
   /** regular expression compiled into a pattern */
   protected final Pattern pattern;

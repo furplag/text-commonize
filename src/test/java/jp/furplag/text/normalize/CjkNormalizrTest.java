@@ -18,12 +18,19 @@ package jp.furplag.text.normalize;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.lang.Character.UnicodeBlock;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.Test;
+
+import jp.furplag.text.optimize.Optimizr;
+import jp.furplag.text.regex.RegexrOrigin;
+import jp.furplag.util.reflect.SavageReflection;
 
 public class CjkNormalizrTest {
 
@@ -53,6 +60,23 @@ public class CjkNormalizrTest {
     assertThat(CjkNormalizr.normalize("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"), is("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"));
     assertThat(CjkNormalizr.normalize("あ゚い゚う゚え゚お゚な゙に゙ぬ゙ね゙の゙"), is("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"));
     assertThat(CjkNormalizr.normalize("パ～やん"), is("パ～やん"));
+  }
+
+  @Test
+  public void testDenormalize() throws IllegalAccessException, NoSuchFieldException, SecurityException {
+    assertThat(CjkNormalizr.denormalize(null), is((String) null));
+    assertThat(CjkNormalizr.denormalize(""), is(""));
+    assertThat(CjkNormalizr.denormalize("   \r\n   \r\n   \r\n"), is(""));
+    assertThat(CjkNormalizr.denormalize("諸行無常"), is("諸行無常"));
+    assertThat(CjkNormalizr.denormalize("南\t無\t阿\t弥\t陀\t仏"), is("南 無 阿 弥 陀 仏"));
+    assertThat(CjkNormalizr.denormalize("Wanderlei Silva"), is("Ｗａｎｄｅｒｌｅｉ Ｓｉｌｖａ"));
+    assertThat(CjkNormalizr.denormalize("Ｗａｎｄｅｒｌｅｉ Ｓｉｌｖａ"), is("Ｗａｎｄｅｒｌｅｉ Ｓｉｌｖａ"));
+
+    @SuppressWarnings("unchecked")
+    Map<Integer, Integer> exclusives = (Map<Integer, Integer>) SavageReflection.get(null, CjkNormalizr.class.getDeclaredField("exclusives"));
+    String latins = RegexrOrigin.newString(IntStream.rangeClosed(0, 0x00FF).toArray());
+    String expect = Optimizr.optimize(RegexrOrigin.newString(latins.codePoints().map(codePoint->exclusives.getOrDefault(codePoint, codePoint + (UnicodeBlock.BASIC_LATIN.equals(UnicodeBlock.of(codePoint)) && !Character.isWhitespace(codePoint) && !Character.isISOControl(codePoint) ? 65248 : 0))).toArray()));
+    assertThat(CjkNormalizr.denormalize(latins), is(expect));
   }
 
   @Test

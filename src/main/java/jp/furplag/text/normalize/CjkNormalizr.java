@@ -13,8 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jp.furplag.text.normalize;
+
+import java.lang.Character.UnicodeBlock;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import jp.furplag.text.optimize.Optimizr;
 import jp.furplag.text.regex.Regexr;
@@ -28,7 +34,8 @@ import jp.furplag.text.regex.RegexrOrigin;
  * <li>similar hyphens normalize to hyphen.</li>
  * <li>hyphen normalize.</li>
  * <li>CJK half width character replace to full width mostly ( Hangul, Katakana, Hiragana ) .</li>
- * <li>CJK full width character replace to Latin or single byte character, if those are convertible.</li>
+ * <li>CJK full width character replace to Latin or single byte character, if those are
+ * convertible.</li>
  * <li>Combining-Voiced-Soundmark replace to Full-Width-Voiced-Soundmark.</li>
  * </ul>
  *
@@ -36,6 +43,20 @@ import jp.furplag.text.regex.RegexrOrigin;
  *
  */
 public final class CjkNormalizr {
+
+  /** codePoint mapping. */
+  private static final int transformer;
+
+  private static final Map<Integer, Integer> exclusives;
+  static {
+    // @formatter:off
+    transformer = "！".codePointAt(0) - "!".codePointAt(0);
+    Map<Integer, Integer> _exclusives = new HashMap<>();
+      Arrays.stream(new Integer[][]{{0xFF65, 0x00B7}, {0xFFE0, 0x00A2}, {0xFFE1, 0x00A3}, {0xFFE2, 0x00AC}, {0xFFE3, 0x00AF}, {0xFFE4, 0x00A6}, {0xFFE5, 0x20A9}, {0xFFE6, 0x00A5}, {0xFFE8, 0x2502}})
+      .forEach(e->_exclusives.put(e[1], e[0]));
+    // @formatter:on
+    exclusives = Collections.unmodifiableMap(_exclusives);
+  }
 
   /**
    * Optimizr instances should NOT be constructed in standard programming.
@@ -50,7 +71,8 @@ public final class CjkNormalizr {
    * <li>similar hyphens normalize to hyphen.</li>
    * <li>hyphen normalize.</li>
    * <li>CJK half width character replace to full width mostly ( Hangul, Katakana, Hiragana ) .</li>
-   * <li>CJK full width character replace to Latin or single byte character, if those are convertible.</li>
+   * <li>CJK full width character replace to Latin or single byte character, if those are
+   * convertible.</li>
    * <li>Combining-Voiced-Soundmark replace to Full-Width-Voiced-Soundmark.</li>
    * </ul>
    *
@@ -58,8 +80,27 @@ public final class CjkNormalizr {
    * @return optimized text
    */
   public static String normalize(final String string) {
-    return RegexrOrigin.isEmpty(string) ? string :
-      Optimizr.optimize(RegexrOrigin.replaceAll(string, Regexr.CjkNormalizr));
+    return RegexrOrigin.isEmpty(string) ? string : Optimizr.optimize(RegexrOrigin.replaceAll(string, Regexr.CjkNormalizr));
+  }
+
+  /**
+   * returns denormalized string for using under standard input text .
+   *
+   * <ul>
+   * <li>optimize text using {@link Optimizr#optimize(String)}.</li>
+   * <li>similar hyphens normalize to hyphen.</li>
+   * <li>hyphen normalize.</li>
+   * <li>Latin or single byte character character replace to CJK full width, if those are
+   * convertible.</li>
+   * <li>Combining-Voiced-Soundmark replace to Full-Width-Voiced-Soundmark.</li>
+   * <li>CJK half width character replace to full width mostly ( Hangul, Katakana, Hiragana ) .</li>
+   * </ul>
+   *
+   * @param string the string, maybe null
+   * @return optimized text
+   */
+  public static String denormalize(final String string) {
+    return RegexrOrigin.isEmpty(string) ? string : normalize(string).codePoints().map(CjkNormalizr::transform).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
   }
 
   /**
@@ -70,5 +111,9 @@ public final class CjkNormalizr {
    */
   public static boolean isNormalized(final String string) {
     return RegexrOrigin.isEmpty(string) || (Optimizr.isOptimized(string) && string.equals(normalize(string)));
+  }
+
+  private static int transform(final int codePoint) {
+    return exclusives.getOrDefault(codePoint, codePoint + (!UnicodeBlock.BASIC_LATIN.equals(UnicodeBlock.of(codePoint)) || Character.isWhitespace(codePoint) ? 0 : transformer));
   }
 }
