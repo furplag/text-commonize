@@ -19,32 +19,41 @@ package jp.furplag.text.normalize;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import org.junit.Test;
 
 public class KatakanizrTest {
 
   @Test
-  public void test() {
-    assertThat(new Katakanizr().order(), is(10));
-    assertThat(new Katakanizr().katakanize(null), is((String) null));
-    assertThat(new Katakanizr().katakanize(""), is(""));
-    assertThat(new Katakanizr().katakanize("Hello World."), is("Hello World."));
-    assertThat(new Katakanizr().katakanize("こんにちは　世界"), is("コンニチハ 世界"));
-    assertThat(new Katakanizr().katakanize("ｺﾝﾆﾁﾊ　世界"), is("コンニチハ 世界"));
-    assertThat(new Katakanizr().katakanize("コンニチハ　世界"), is("コンニチハ 世界"));
-    assertThat(new Katakanizr().katakanize("バーバパパ"), is("バーバパパ"));
-    assertThat(new Katakanizr().katakanize("ﾊﾞｰﾊﾞﾊﾟﾊﾟ"), is("バーバパパ"));
-    assertThat(new Katakanizr().katakanize("ハ゛ーハ゛ハ゜ハ゜"), is("バーバパパ"));
-    assertThat(new Katakanizr().katakanize("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
-    assertThat(new Katakanizr().katakanize("ワ゛ヰ゛ウ゛ヱ゛ヲ゛"), is("ヷヸヴヹヺ"));
-    assertThat(new Katakanizr().katakanize("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
-    assertThat(new Katakanizr().katakanize("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"), is("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"));
-    assertThat(new Katakanizr().katakanize("あ゚い゚う゚え゚お゚な゙に゙ぬ゙ね゙の゙"), is("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"));
-    assertThat(new Katakanizr().katakanize("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"), is("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"));
-    assertThat(new Katakanizr().katakanize("ア゚イ゚ウ゚エ゚オ゚ナ゙ニ゙ヌ゙ネ゙ノ゙"), is("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"));
-    assertThat(new Katakanizr().katakanize("ｱﾟｲﾟｳﾟｴﾟｵﾟﾅﾞﾆﾞﾇﾞﾈﾞﾉﾞ"), is("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"));
-    assertThat(new Katakanizr().katakanize("パ～やん"), is("パ～ヤン"));
-    assertThat(new Katakanizr().katakanize("ｱﾚﾝ･ｷﾞﾝｽﾞﾊﾞｰｸﾞ"), is("アレン・ギンズバーグ"));
+  public void test() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Constructor<?> c = Katakanizr.class.getDeclaredConstructor();
+    c.setAccessible(true);
+    assertThat(c.newInstance() instanceof Katakanizr, is(true));
+  }
+
+  @Test
+  public void testKatakanize() {
+    assertThat(Katakanizr.katakanize(null), is((String) null));
+    assertThat(Katakanizr.katakanize(""), is(""));
+    assertThat(Katakanizr.katakanize("Hello World."), is("Hello World."));
+    assertThat(Katakanizr.katakanize("こんにちは　世界"), is("コンニチハ 世界"));
+    assertThat(Katakanizr.katakanize("ｺﾝﾆﾁﾊ　世界"), is("コンニチハ 世界"));
+    assertThat(Katakanizr.katakanize("コンニチハ　世界"), is("コンニチハ 世界"));
+    assertThat(Katakanizr.katakanize("バーバパパ"), is("バーバパパ"));
+    assertThat(Katakanizr.katakanize("ﾊﾞｰﾊﾞﾊﾟﾊﾟ"), is("バーバパパ"));
+    assertThat(Katakanizr.katakanize("ハ゛ーハ゛ハ゜ハ゜"), is("バーバパパ"));
+    assertThat(Katakanizr.katakanize("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
+    assertThat(Katakanizr.katakanize("ワ゛ヰ゛ウ゛ヱ゛ヲ゛"), is("ヷヸヴヹヺ"));
+    assertThat(Katakanizr.katakanize("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
+    assertThat(Katakanizr.katakanize("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"), is("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"));
+    assertThat(Katakanizr.katakanize("あ゚い゚う゚え゚お゚な゙に゙ぬ゙ね゙の゙"), is("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"));
+    assertThat(Katakanizr.katakanize("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"), is("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"));
+    assertThat(Katakanizr.katakanize("ア゚イ゚ウ゚エ゚オ゚ナ゙ニ゙ヌ゙ネ゙ノ゙"), is("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"));
+    assertThat(Katakanizr.katakanize("ｱﾟｲﾟｳﾟｴﾟｵﾟﾅﾞﾆﾞﾇﾞﾈﾞﾉﾞ"), is("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"));
+    assertThat(Katakanizr.katakanize("パ～やん"), is("パ～ヤン"));
+    assertThat(Katakanizr.katakanize("ｱﾚﾝ･ｷﾞﾝｽﾞﾊﾞｰｸﾞ"), is("アレン・ギンズバーグ"));
   }
 
 }

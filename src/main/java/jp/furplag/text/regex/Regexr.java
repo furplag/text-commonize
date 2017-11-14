@@ -37,10 +37,10 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
   public static final Regexr CtrlRemovr = new RegexrStandard("[\\p{Cc}&&[^\\s\\x{001C}-\\x{001F}]]", "", 0);
 
   /** replace whitespaces to space. */
-  public static final Regexr SpaceNormalizr = new RegexrStandard("[\\p{javaWhitespace}&&[^\\x{000A}\\x{0020}]]", "\u0020", 10);
+  public static final Regexr SpaceNormalizr = new RegexrStandard("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", "\u0020", 10);
 
   /** replace a sequence of spaces with a single spaces. */
-  public static final Regexr SpaceLintr = new RegexrRecursive("[\\p{javaWhitespace}&&[^\\x{000A}]]{2,}", "\u0020", 100);
+  public static final Regexr SpaceLintr = new RegexrRecursive("[\\p{javaWhitespace}&&[^\\n]]{2,}", "\u0020", 100);
 
   /** remove empty rows. */
   public static final Regexr LinefeedLintr = new RegexrRecursive("\\s+\\n|\\n\\s+", "\n", 1_000);
@@ -56,8 +56,7 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
    * </p>
    * <ul>
    * <li>CJK half width character replace to full width mostly ( Hangul, Katakana, Hiragana ) .</li>
-   * <li>CJK full width character replace to Latin or single byte character, if those are
-   * convertible.</li>
+   * <li>CJK full width character replace to Latin or single byte character, if those are convertible.</li>
    * </ul>
    *
    */

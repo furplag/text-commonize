@@ -212,7 +212,7 @@ public class RegexrTest {
 
   @Test
   public void testSpaceLintr() {
-    assertThat(Regexr.SpaceLintr, is(new RegexrRecursive("[\\p{javaWhitespace}&&[^\\x{000A}]]{2,}", "\u0020")));
+    assertThat(Regexr.SpaceLintr, is(new RegexrRecursive("[\\p{javaWhitespace}&&[^\\n]]{2,}", "\u0020")));
     assertThat(Regexr.SpaceLintr.order(), is(100));
 
     final String string = "S h r i n k m e .";
@@ -227,15 +227,15 @@ public class RegexrTest {
 
   @Test
   public void testSpaceNormalizr() {
-    assertThat(Regexr.SpaceNormalizr, is(new RegexrStandard("[\\p{javaWhitespace}&&[^\\x{000A}\\x{0020}]]", "\u0020")));
+    assertThat(Regexr.SpaceNormalizr, is(new RegexrStandard("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", "\u0020")));
     assertThat(Regexr.SpaceNormalizr.order(), is(10));
 
-    String spaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).filter(codePoint -> codePoint != 0x000A && codePoint != 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String spaces = IntStream.rangeClosed(0, 200_000).filter(codePoint -> Character.isWhitespace(codePoint) || codePoint == 0x00A0).filter(codePoint -> codePoint != 0x000A && codePoint != 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
     String spacesR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.SpaceNormalizr.pattern().matcher(s).matches()).collect(Collectors.joining());
     assertThat(spacesR.codePoints().toArray(), is(spaces.codePoints().toArray()));
     assertThat(spacesR, is(spaces));
-    assertThat(Regexr.SpaceNormalizr.replaceAll(spaces), is(spaces.replaceAll("\\p{javaWhitespace}", " ")));
-    assertThat(Regexr.SpaceNormalizr.replaceAll(spacesR), is(spacesR.replaceAll("\\p{javaWhitespace}", " ")));
+    assertThat(Regexr.SpaceNormalizr.replaceAll(spaces), is(spaces.replaceAll("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", " ")));
+    assertThat(Regexr.SpaceNormalizr.replaceAll(spacesR), is(spacesR.replaceAll("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", " ")));
 
     final String string = "N o r m a l i z e m e .";
     String uglified = "";
@@ -243,13 +243,13 @@ public class RegexrTest {
       // @formatter:off
       uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(space + space + space + space + space));
       // @formatter:on
-      assertThat(Character.isWhitespace(space.codePointAt(0)), is(true));
-      assertThat(Regexr.SpaceNormalizr.replaceAll(uglified), is(Arrays.stream(string.split("\u0020")).collect(Collectors.joining("\u0020\u0020\u0020\u0020\u0020"))));
+      assertThat(Integer.valueOf(space.codePointAt(0)).toString(), Character.isWhitespace(space.codePointAt(0)) || "\u00A0".equals(space), is(true));
+      assertThat(Regexr.SpaceNormalizr.replaceAll(uglified), is(Arrays.stream(string.split("\u0020")).collect(Collectors.joining("\u0020"))));
     }
     uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(spaces));
-    assertThat(Regexr.SpaceNormalizr.replaceAll(uglified), is(Arrays.stream(string.split("\u0020")).collect(Collectors.joining(spaces.replaceAll("\\p{javaWhitespace}", " ")))));
+    assertThat(Regexr.SpaceNormalizr.replaceAll(uglified), is(string));
     uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(spacesR));
-    assertThat(Regexr.SpaceNormalizr.replaceAll(uglified), is(Arrays.stream(string.split("\u0020")).collect(Collectors.joining(spacesR.replaceAll("\\p{javaWhitespace}", " ")))));
+    assertThat(Regexr.SpaceNormalizr.replaceAll(uglified), is(string));
   }
 
   @Test

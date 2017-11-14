@@ -18,9 +18,11 @@ package jp.furplag.text.normalize;
 
 import java.lang.Character.UnicodeBlock;
 import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import jp.furplag.text.regex.Regexr;
+import jp.furplag.text.regex.RegexrOrigin;
 import jp.furplag.text.regex.RegexrStandard;
 
 /**
@@ -29,49 +31,23 @@ import jp.furplag.text.regex.RegexrStandard;
  * @author furplag
  *
  */
-public final class Hiraganizr extends StandardNormalizr {
+public final class Hiraganizr {
 
+  /** codePoint mapping. */
   private static final int transformer;
+
+  /** character codePoint(s) except from replacing . */
+  private static final Set<Integer> exclusions;
+
   static {
     transformer = "あ".codePointAt(0) - "ア".codePointAt(0);
+    exclusions = Arrays.asList(12448, 12535, 12536, 12537, 12538, 12539, 12540, 12543).stream().map(Integer::valueOf).collect(Collectors.toSet());
   }
 
   /** codePoint mapping. */
-  public Hiraganizr() {
-    // @formatter:off
-    super(
-      null
-    , new Regexr[]{
-        new RegexrStandard("\\x{30F7}", "\u308F\u309B", 100)
-      , new RegexrStandard("\\x{30F8}", "\u3090\u309B", 100)
-      , new RegexrStandard("\\x{30F9}", "\u3091\u309B", 100)
-      , new RegexrStandard("\\x{30FA}", "\u3092\u309B", 100)
-      }
-    , Arrays.asList(12448, 12535, 12536, 12537, 12538, 12539, 12540, 12543).stream().map(Integer::valueOf).collect(Collectors.toSet()));
-    // @formatter:on
- }
+  private Hiraganizr() {}
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected String normalization(String string) {
-    return nfkc(string);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected int order() {
-    return 10;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected int transform(int codePoint) {
+  private static int transform(final int codePoint) {
     return codePoint + (!exclusions.contains(codePoint) && UnicodeBlock.KATAKANA.equals(UnicodeBlock.of(codePoint)) ? transformer : 0);
   }
 
@@ -81,7 +57,20 @@ public final class Hiraganizr extends StandardNormalizr {
    * @param string the String, maybe null
    * @return Hiraganized text
    */
-  public String hiraganize(String string) {
-    return normalize(string);
+  public static String hiraganize(final String string) {
+    // @formatter:off
+    return RegexrOrigin.isEmpty(string) ? string :
+      RegexrOrigin.replaceAll(
+        Optional.ofNullable(CjkNormalizr.normalize(string)).orElse("")
+          .codePoints()
+          .map(Hiraganizr::transform)
+          .mapToObj(RegexrOrigin::newString)
+          .collect(Collectors.joining())
+      , new RegexrStandard("\\x{30F7}", "\u308F\u309B")
+      , new RegexrStandard("\\x{30F8}", "\u3090\u309B")
+      , new RegexrStandard("\\x{30F9}", "\u3091\u309B")
+      , new RegexrStandard("\\x{30FA}", "\u3092\u309B")
+      );
+    // @formatter:on
   }
 }

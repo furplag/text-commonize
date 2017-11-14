@@ -17,6 +17,12 @@
 package jp.furplag.text.normalize;
 
 import java.lang.Character.UnicodeBlock;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import jp.furplag.text.regex.RegexrOrigin;
 
 /**
  * Hiragana convert to Katakana .
@@ -24,43 +30,21 @@ import java.lang.Character.UnicodeBlock;
  * @author furplag
  *
  */
-public final class Katakanizr extends StandardNormalizr {
+public final class Katakanizr {
 
   /** codePoint mapping. */
   private static final int transformer;
+
+  /** character codePoint(s) except from replacing . */
+  private static final Set<Integer> exclusions;
+
   static {
     transformer = "ア".codePointAt(0) - "あ".codePointAt(0);
+    exclusions = Arrays.asList(12352, 12439, 12440, 12441, 12442, 12443, 12444, 12447).stream().map(Integer::valueOf).collect(Collectors.toSet());
   }
 
-  public Katakanizr() {
-    // @formatter:off
-    super(12352, 12439, 12440, 12441, 12442, 12443, 12444, 12447);
-    // @formatter:on
- }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected String normalization(String string) {
-    return nfkc(string);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected int order() {
-    return 10;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected int transform(int codePoint) {
-    return codePoint + (!exclusions.contains(codePoint) && UnicodeBlock.HIRAGANA.equals(UnicodeBlock.of(codePoint)) ? transformer : 0);
-  }
+  private Katakanizr() {}
 
   /**
    * Hiragana convert to Katakana .
@@ -68,7 +52,19 @@ public final class Katakanizr extends StandardNormalizr {
    * @param string the String, maybe null
    * @return Katakanized text
    */
-  public String katakanize(String string) {
-    return normalize(string);
+  public static String katakanize(final String string) {
+      // @formatter:off
+      return RegexrOrigin.isEmpty(string) ? string :
+        Optional.ofNullable(CjkNormalizr.normalize(string)).orElse("")
+          .codePoints()
+          .map(Katakanizr::transform)
+          .mapToObj(RegexrOrigin::newString)
+          .collect(Collectors.joining())
+        ;
+      // @formatter:on
+  }
+
+  private static int transform(final int codePoint) {
+    return codePoint + (!exclusions.contains(codePoint) && UnicodeBlock.HIRAGANA.equals(UnicodeBlock.of(codePoint)) ? transformer : 0);
   }
 }
