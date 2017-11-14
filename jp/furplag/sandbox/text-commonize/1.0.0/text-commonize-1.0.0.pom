@@ -58,6 +58,19 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
   </properties>
 
+  <repositories>
+
+    <repository>
+      <id>jp.furplag.sandbox.java.util.savage-reflections</id>
+      <url>https://raw.github.com/furplag/savage-reflections/mvn-repo/</url>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+
+  </repositories>
+
   <dependencies>
 
     <dependency>
