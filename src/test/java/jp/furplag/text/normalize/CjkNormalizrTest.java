@@ -21,7 +21,6 @@ import static org.junit.Assert.*;
 
 import java.lang.Character.UnicodeBlock;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,14 +28,14 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
+import jp.furplag.reflect.SavageReflection;
 import jp.furplag.text.optimize.Optimizr;
 import jp.furplag.text.regex.RegexrOrigin;
-import jp.furplag.util.reflect.SavageReflection;
 
 public class CjkNormalizrTest {
 
   @Test
-  public void test() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+  public void test() throws SecurityException, ReflectiveOperationException {
     Constructor<?> c = CjkNormalizr.class.getDeclaredConstructor();
     c.setAccessible(true);
     assertThat(c.newInstance() instanceof CjkNormalizr, is(true));
@@ -64,7 +63,7 @@ public class CjkNormalizrTest {
   }
 
   @Test
-  public void testDenormalize() throws IllegalAccessException, NoSuchFieldException, SecurityException {
+  public void testDenormalize() throws SecurityException, ReflectiveOperationException {
     assertThat(CjkNormalizr.denormalize(null), is((String) null));
     assertThat(CjkNormalizr.denormalize(""), is(""));
     assertThat(CjkNormalizr.denormalize("   \r\n   \r\n   \r\n"), is(""));
@@ -74,7 +73,7 @@ public class CjkNormalizrTest {
     assertThat(CjkNormalizr.denormalize("Ｗａｎｄｅｒｌｅｉ Ｓｉｌｖａ"), is("Ｗａｎｄｅｒｌｅｉ Ｓｉｌｖａ"));
 
     @SuppressWarnings("unchecked")
-    Map<Integer, Integer> exclusives = (Map<Integer, Integer>) SavageReflection.get(null, CjkNormalizr.class.getDeclaredField("exclusives"));
+    Map<Integer, Integer> exclusives = (Map<Integer, Integer>) SavageReflection.get(CjkNormalizr.class, "exclusives");
     String latins = RegexrOrigin.newString(IntStream.rangeClosed(0, 0x00FF).toArray());
     String expect = Optimizr.optimize(RegexrOrigin.newString(latins.codePoints().map(codePoint->exclusives.getOrDefault(codePoint, codePoint + (UnicodeBlock.BASIC_LATIN.equals(UnicodeBlock.of(codePoint)) && !Character.isWhitespace(codePoint) && !Character.isISOControl(codePoint) ? 65248 : 0))).toArray()));
     assertThat(CjkNormalizr.denormalize(latins), is(expect));

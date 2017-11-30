@@ -33,7 +33,7 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
-import jp.furplag.util.reflect.SavageReflection;
+import jp.furplag.reflect.SavageReflection;
 
 public class RegexrTest {
 
@@ -53,8 +53,7 @@ public class RegexrTest {
 
     assertThat(one.equals(null), is(false));
     assertThat(one.equals((Regexr) null), is(false));
-    assertThat(one.equals(""), is(false));
-    assertThat(one.equals(new RegexrOrigin() {
+    RegexrOrigin anotherOne = new RegexrOrigin() {
       @Override
       public List<String> find(String string) {
         return null;
@@ -79,11 +78,12 @@ public class RegexrTest {
       public Pattern pattern() {
         return null;
       }
-    }), is(false));
+    };
+    assertThat(one.equals(anotherOne), is(false));
     assertThat(one.equals(two), is(false));
     assertThat(one.equals(new Regexr("one", "1", 1) {}), is(false));
     assertThat(one == two, is(false));
-    RegexrOrigin anotherOne = one;
+    anotherOne = one;
     assertThat(one == anotherOne, is(true));
     assertThat(one == new Regexr("one", "壱", 1) {}, is(false));
     assertThat(one.equals(one), is(true));

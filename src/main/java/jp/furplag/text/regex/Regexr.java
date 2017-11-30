@@ -128,6 +128,14 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
    * {@inheritDoc}
    */
   @Override
+  public boolean equals(Object obj) {
+    return this == obj || (obj instanceof Regexr && this.toString().equals(((Regexr) obj).toString()));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public List<String> find(String string) {
     List<String> result = new ArrayList<>();
     if (!RegexrOrigin.isEmpty(string)) {
@@ -136,6 +144,19 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
         result.add(matcher.group());
       }
     }
+
+    return result;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((pattern == null) ? 0 : pattern.toString().hashCode());
+    result = prime * result + ((replacement == null) ? 0 : replacement.hashCode());
 
     return result;
   }
@@ -164,27 +185,6 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
   @Override
   public String replaceAll(String string) {
     return RegexrOrigin.isEmpty(string) ? string : pattern.matcher(string).replaceAll(replacement);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((pattern == null) ? 0 : pattern.toString().hashCode());
-    result = prime * result + ((replacement == null) ? 0 : replacement.hashCode());
-
-    return result;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean equals(Object obj) {
-    return this == obj || (obj instanceof Regexr && this.toString().equals(((Regexr) obj).toString()));
   }
 
   /**

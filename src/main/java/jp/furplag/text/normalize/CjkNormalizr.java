@@ -1,3 +1,4 @@
+
 /**
  * Copyright (C) 2017+ furplag (https://github.com/furplag)
  *
@@ -35,8 +36,7 @@ import jp.furplag.text.regex.RegexrOrigin;
  * <li>similar hyphens normalize to hyphen.</li>
  * <li>hyphen normalize.</li>
  * <li>CJK half width character replace to full width mostly ( Hangul, Katakana, Hiragana ) .</li>
- * <li>CJK full width character replace to Latin or single byte character, if those are
- * convertible.</li>
+ * <li>CJK full width character replace to Latin or single byte character, if those are convertible.</li>
  * <li>Combining-Voiced-Soundmark replace to Full-Width-Voiced-Soundmark.</li>
  * </ul>
  *
@@ -45,43 +45,19 @@ import jp.furplag.text.regex.RegexrOrigin;
  */
 public final class CjkNormalizr {
 
-  /** codePoint mapping. */
-  private static final int transformer;
+  /** the amount of add to Unicode code point of the target character. */
+  private static final int differenceOfCodepoint;
 
+  /** exclude characters from translate. */
   private static final Map<Integer, Integer> exclusives;
   static {
     // @formatter:off
-    transformer = "！".codePointAt(0) - "!".codePointAt(0);
+    differenceOfCodepoint = "！".codePointAt(0) - "!".codePointAt(0);
     Map<Integer, Integer> _exclusives = new HashMap<>();
       Arrays.stream(new Integer[][]{{0xFF65, 0x00B7}, {0xFFE0, 0x00A2}, {0xFFE1, 0x00A3}, {0xFFE2, 0x00AC}, {0xFFE3, 0x00AF}, {0xFFE4, 0x00A6}, {0xFFE5, 0x20A9}, {0xFFE6, 0x00A5}, {0xFFE8, 0x2502}})
       .forEach(e->_exclusives.put(e[1], e[0]));
     // @formatter:on
     exclusives = Collections.unmodifiableMap(_exclusives);
-  }
-
-  /**
-   * Optimizr instances should NOT be constructed in standard programming.
-   */
-  private CjkNormalizr() {}
-
-  /**
-   * returns normalized string for using under standard input text .
-   *
-   * <ul>
-   * <li>optimize text using {@link Optimizr#optimize(String)}.</li>
-   * <li>similar hyphens normalize to hyphen.</li>
-   * <li>hyphen normalize.</li>
-   * <li>CJK half width character replace to full width mostly ( Hangul, Katakana, Hiragana ) .</li>
-   * <li>CJK full width character replace to Latin or single byte character, if those are
-   * convertible.</li>
-   * <li>Combining-Voiced-Soundmark replace to Full-Width-Voiced-Soundmark.</li>
-   * </ul>
-   *
-   * @param string the string, maybe null
-   * @return optimized text
-   */
-  public static String normalize(final String string) {
-    return RegexrOrigin.isEmpty(string) ? string : Optimizr.optimize(RegexrOrigin.replaceAll(string, Regexr.CjkNormalizr));
   }
 
   /**
@@ -91,8 +67,7 @@ public final class CjkNormalizr {
    * <li>optimize text using {@link Optimizr#optimize(String)}.</li>
    * <li>similar hyphens normalize to hyphen.</li>
    * <li>hyphen normalize.</li>
-   * <li>Latin or single byte character character replace to CJK full width, if those are
-   * convertible.</li>
+   * <li>Latin or single byte character character replace to CJK full width, if those are convertible.</li>
    * <li>Combining-Voiced-Soundmark replace to Full-Width-Voiced-Soundmark.</li>
    * <li>CJK half width character replace to full width mostly ( Hangul, Katakana, Hiragana ) .</li>
    * </ul>
@@ -101,7 +76,7 @@ public final class CjkNormalizr {
    * @return optimized text
    */
   public static String denormalize(final String string) {
-    return RegexrOrigin.isEmpty(string) ? string : normalize(string).codePoints().map(CjkNormalizr::transform).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    return RegexrOrigin.isEmpty(string) ? string : normalize(string).codePoints().map(CjkNormalizr::translate).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
   }
 
   /**
@@ -114,7 +89,38 @@ public final class CjkNormalizr {
     return RegexrOrigin.isEmpty(string) || (Optimizr.isOptimized(string) && string.equals(normalize(string)));
   }
 
-  private static int transform(final int codePoint) {
-    return exclusives.getOrDefault(codePoint, codePoint + (!UnicodeBlock.BASIC_LATIN.equals(UnicodeBlock.of(codePoint)) || Character.isWhitespace(codePoint) ? 0 : transformer));
+  /**
+   * returns normalized string for using under standard input text .
+   *
+   * <ul>
+   * <li>optimize text using {@link Optimizr#optimize(String)}.</li>
+   * <li>similar hyphens normalize to hyphen.</li>
+   * <li>hyphen normalize.</li>
+   * <li>CJK half width character replace to full width mostly ( Hangul, Katakana, Hiragana ) .</li>
+   * <li>CJK full width character replace to Latin or single byte character, if those are convertible.</li>
+   * <li>Combining-Voiced-Soundmark replace to Full-Width-Voiced-Soundmark.</li>
+   * </ul>
+   *
+   * @param string the string, maybe null
+   * @return optimized text
+   */
+  public static String normalize(final String string) {
+    return RegexrOrigin.isEmpty(string) ? string : Optimizr.optimize(RegexrOrigin.replaceAll(string, Regexr.CjkNormalizr));
   }
+
+  /**
+   * convert to full width character if the character is the member of {@link UnicodeBlock.BASIC_LATIN} .
+   *
+   * @param codePoint Unicode code point
+   * @return text denormalize if the character is the member of {@link UnicodeBlock.BASIC_LATIN}
+   */
+  private static int translate(final int codePoint) {
+    return exclusives.getOrDefault(codePoint, codePoint + (!UnicodeBlock.BASIC_LATIN.equals(UnicodeBlock.of(codePoint)) || Character.isWhitespace(codePoint) ? 0 : differenceOfCodepoint));
+  }
+
+
+  /**
+   * CjkNormalizr instances should NOT be constructed in standard programming.
+   */
+  private CjkNormalizr() {}
 }

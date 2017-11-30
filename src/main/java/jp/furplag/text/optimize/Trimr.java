@@ -30,9 +30,14 @@ public final class Trimr {
   private static final Regexr[] regexrs = {Regexr.CtrlRemovr, Regexr.Trimr};
 
   /**
-   * Trimr instances should NOT be constructed in standard programming.
+   * detects whether the specified string is trimmed.
+   *
+   * @param string the string, maybe null
+   * @return true if the specified string is trimmed
    */
-  private Trimr() {}
+  public static boolean isTrimmed(final String string) {
+    return RegexrOrigin.isEmpty(string) || !RegexrOrigin.anyMatch(string, regexrs);
+  }
 
   /**
    * remove Control Character and remove leading and trailing space.
@@ -45,12 +50,7 @@ public final class Trimr {
   }
 
   /**
-   * detects whether the specified string is trimmed.
-   *
-   * @param string the string, maybe null
-   * @return true if the specified string is trimmed
+   * Trimr instances should NOT be constructed in standard programming.
    */
-  public static boolean isTrimmed(final String string) {
-    return RegexrOrigin.isEmpty(string) || !RegexrOrigin.anyMatch(string, regexrs);
-  }
+  private Trimr() {}
 }

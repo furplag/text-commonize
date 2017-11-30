@@ -34,12 +34,20 @@ import jp.furplag.text.regex.RegexrOrigin;
  */
 public final class Optimizr {
 
+  /** {@link Regexr}. */
   private static final Regexr[] regexrs = {Regexr.CtrlRemovr, Regexr.SpaceNormalizr, Regexr.SpaceLintr, Regexr.LinefeedLintr, Regexr.Trimr};
 
   /**
-   * Optimizr instances should NOT be constructed in standard programming.
+   * detects whether the specified string is optimized.
+   *
+   * @param string the string, maybe null
+   * @return true if the specified string is optimized
    */
-  private Optimizr() {}
+  public static boolean isOptimized(final String string) {
+    Regexr[] regexrs = {Regexr.CtrlRemovr, Regexr.SpaceLintr, Regexr.LinefeedLintr, Regexr.Trimr};
+
+    return RegexrOrigin.isEmpty(string) || !RegexrOrigin.anyMatch(string, regexrs);
+  }
 
   /**
    * returns optimized string for using under standard input text .
@@ -59,14 +67,7 @@ public final class Optimizr {
   }
 
   /**
-   * detects whether the specified string is optimized.
-   *
-   * @param string the string, maybe null
-   * @return true if the specified string is optimized
+   * Optimizr instances should NOT be constructed in standard programming.
    */
-  public static boolean isOptimized(final String string) {
-    Regexr[] regexrs = {Regexr.CtrlRemovr, Regexr.SpaceLintr, Regexr.LinefeedLintr, Regexr.Trimr};
-
-    return RegexrOrigin.isEmpty(string) || !RegexrOrigin.anyMatch(string, regexrs);
-  }
+  private Optimizr() {}
 }
