@@ -28,9 +28,19 @@ Add the following snippet to any project's pom that depends on your project
   <dependency>
     <groupId>jp.furplag.sandbox</groupId>
     <artifactId>text-commonize</artifactId>
-    <version>1.0.0</version>
+    <version>[1.1,)</version>
   </dependency>
 </dependencies>
+```
+
+## Usage
+```java
+
+  // CjkNormalizr#normalize(String)
+  String anExampleSomeoneInputHisName = "醜悪な　入力値（ｾｸｼｬﾙｳﾞｧｲｵﾚｯﾄ＃１）";
+  System.out.println(CjkNormalizr.normalize(anExampleSomeoneInputHisName)); // "醜悪な 入力値(セクシャルヴァイオレット#1)"
+  String anotherOneInputHisName = "Mr.\t Copy&Ｐａｓｔｅ\r\n";
+  System.out.println(CjkNormalizr.normalize(anotherOneInputHisName)); // "Mr. Copy&Paste"
 ```
 
 ## License
