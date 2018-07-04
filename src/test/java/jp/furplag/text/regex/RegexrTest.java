@@ -33,7 +33,7 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
-import jp.furplag.reflect.SavageReflection;
+import jp.furplag.sandbox.reflect.SavageReflection;
 
 public class RegexrTest {
 

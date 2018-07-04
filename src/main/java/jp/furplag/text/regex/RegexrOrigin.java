@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 public interface RegexrOrigin {
 
   /**
-   * returns result of evaluate that {@link Matcher#find(String)} .
+   * returns result of evaluate that {@link RegexrOrigin#find(String)} .
    *
    * @param string the string
    * @param regexrs {@link Regexr Regexr(s)}
@@ -167,7 +167,7 @@ public interface RegexrOrigin {
 
 
   /**
-   * returns result of evaluate that {@link Matcher#find(String)} .
+   * returns result of evaluate that {@link Matcher#find()} .
    *
    * @param string the string
    * @return {@code true} if, and only if, a subsequence of the input sequence matches this pattern

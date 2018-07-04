@@ -28,7 +28,7 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
-import jp.furplag.reflect.SavageReflection;
+import jp.furplag.sandbox.reflect.SavageReflection;
 import jp.furplag.text.optimize.Optimizr;
 import jp.furplag.text.regex.RegexrOrigin;
 
@@ -63,6 +63,7 @@ public class CjkNormalizrTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testDenormalize() throws SecurityException, ReflectiveOperationException {
     assertThat(CjkNormalizr.denormalize(null), is((String) null));
     assertThat(CjkNormalizr.denormalize(""), is(""));
@@ -72,7 +73,6 @@ public class CjkNormalizrTest {
     assertThat(CjkNormalizr.denormalize("Wanderlei Silva"), is("Ｗａｎｄｅｒｌｅｉ Ｓｉｌｖａ"));
     assertThat(CjkNormalizr.denormalize("Ｗａｎｄｅｒｌｅｉ Ｓｉｌｖａ"), is("Ｗａｎｄｅｒｌｅｉ Ｓｉｌｖａ"));
 
-    @SuppressWarnings("unchecked")
     Map<Integer, Integer> exclusives = (Map<Integer, Integer>) SavageReflection.get(CjkNormalizr.class, "exclusives");
     String latins = RegexrOrigin.newString(IntStream.rangeClosed(0, 0x00FF).toArray());
     String expect = Optimizr.optimize(RegexrOrigin.newString(latins.codePoints().map(codePoint->exclusives.getOrDefault(codePoint, codePoint + (UnicodeBlock.BASIC_LATIN.equals(UnicodeBlock.of(codePoint)) && !Character.isWhitespace(codePoint) && !Character.isISOControl(codePoint) ? 65248 : 0))).toArray()));

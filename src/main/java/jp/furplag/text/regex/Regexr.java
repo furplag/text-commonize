@@ -162,7 +162,7 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
   }
 
   /**
-   * returns evalute result that {@link Matcher#find(String)} .
+   * returns evalute result that {@link Matcher#find()} .
    */
   @Override
   public boolean matches(String string) {
