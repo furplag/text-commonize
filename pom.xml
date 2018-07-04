@@ -61,8 +61,8 @@
   <repositories>
 
     <repository>
-      <id>jp.furplag.sandbox.savage-reflections</id>
-      <url>https://raw.github.com/furplag/savage-reflections/mvn-repo/</url>
+      <id>jp.furplag.sandbox.relic</id>
+      <url>https://raw.github.com/furplag/relic/mvn-repo/</url>
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
