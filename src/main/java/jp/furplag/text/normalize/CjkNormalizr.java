@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import jp.furplag.text.optimize.Optimizr;
+import jp.furplag.text.optimize.Stringr;
 import jp.furplag.text.regex.Regexr;
 import jp.furplag.text.regex.RegexrOrigin;
 
@@ -76,7 +77,7 @@ public final class CjkNormalizr {
    * @return optimized text
    */
   public static String denormalize(final String string) {
-    return RegexrOrigin.isEmpty(string) ? string : normalize(string).codePoints().map(CjkNormalizr::translate).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    return Stringr.isEmpty(string) ? string : normalize(string).codePoints().map(CjkNormalizr::translate).mapToObj(Stringr::newString).collect(Collectors.joining());
   }
 
   /**
@@ -86,7 +87,7 @@ public final class CjkNormalizr {
    * @return true if the specified string is normalized
    */
   public static boolean isNormalized(final String string) {
-    return RegexrOrigin.isEmpty(string) || (Optimizr.isOptimized(string) && string.equals(normalize(string)));
+    return Stringr.isEmpty(string) || (Optimizr.isOptimized(string) && string.equals(normalize(string)));
   }
 
   /**
@@ -105,7 +106,7 @@ public final class CjkNormalizr {
    * @return optimized text
    */
   public static String normalize(final String string) {
-    return RegexrOrigin.isEmpty(string) ? string : Optimizr.optimize(RegexrOrigin.replaceAll(string, Regexr.CjkNormalizr));
+    return Stringr.isEmpty(string) ? string : Optimizr.optimize(RegexrOrigin.replaceAll(string, Regexr.CjkNormalizr));
   }
 
   /**

@@ -18,6 +18,8 @@ package jp.furplag.text.regex;
 
 import java.util.regex.Matcher;
 
+import jp.furplag.text.optimize.Stringr;
+
 /**
  * recursive text replacing .
  *
@@ -42,7 +44,7 @@ public class RegexrRecursive extends Regexr {
    */
   @Override
   public String replaceAll(final String string) {
-    if (RegexrOrigin.isEmpty(string)) return string;
+    if (Stringr.isEmpty(string)) return string;
     String result = string;
     Matcher matcher = pattern.matcher(result);
     while (matcher.find()) {

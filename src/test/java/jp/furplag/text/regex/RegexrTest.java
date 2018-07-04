@@ -34,6 +34,7 @@ import java.util.stream.IntStream;
 import org.junit.Test;
 
 import jp.furplag.sandbox.reflect.SavageReflection;
+import jp.furplag.text.optimize.Stringr;
 
 public class RegexrTest {
 
@@ -175,8 +176,8 @@ public class RegexrTest {
     assertThat(Regexr.CtrlRemovr, is(new RegexrStandard("[\\p{Cc}&&[^\\s\\x{001C}-\\x{001F}]]", "")));
     assertThat(Regexr.CtrlRemovr.order(), is(0));
 
-    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String ctrlsR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.CtrlRemovr.pattern.matcher(s).matches()).collect(Collectors.joining());
+    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(Stringr::newString).collect(Collectors.joining());
+    String ctrlsR = IntStream.rangeClosed(0, 200_000).mapToObj(Stringr::newString).filter(s -> Regexr.CtrlRemovr.pattern.matcher(s).matches()).collect(Collectors.joining());
     assertThat(ctrlsR.codePoints().toArray(), is(ctrls.codePoints().toArray()));
     assertThat(ctrlsR, is(ctrls));
     assertThat(Regexr.CtrlRemovr.replaceAll(ctrls), is(""));
@@ -231,8 +232,8 @@ public class RegexrTest {
     assertThat(Regexr.SpaceNormalizr, is(new RegexrStandard("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", "\u0020")));
     assertThat(Regexr.SpaceNormalizr.order(), is(10));
 
-    String spaces = IntStream.rangeClosed(0, 200_000).filter(codePoint -> Character.isWhitespace(codePoint) || codePoint == 0x00A0).filter(codePoint -> codePoint != 0x000A && codePoint != 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String spacesR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.SpaceNormalizr.pattern().matcher(s).matches()).collect(Collectors.joining());
+    String spaces = IntStream.rangeClosed(0, 200_000).filter(codePoint -> Character.isWhitespace(codePoint) || codePoint == 0x00A0).filter(codePoint -> codePoint != 0x000A && codePoint != 0x0020).mapToObj(Stringr::newString).collect(Collectors.joining());
+    String spacesR = IntStream.rangeClosed(0, 200_000).mapToObj(Stringr::newString).filter(s -> Regexr.SpaceNormalizr.pattern().matcher(s).matches()).collect(Collectors.joining());
     assertThat(spacesR.codePoints().toArray(), is(spaces.codePoints().toArray()));
     assertThat(spacesR, is(spaces));
     assertThat(Regexr.SpaceNormalizr.replaceAll(spaces), is(spaces.replaceAll("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", " ")));
@@ -258,8 +259,8 @@ public class RegexrTest {
     assertThat(Regexr.Trimr, is(new RegexrStandard("^[\\p{javaWhitespace}]+|[\\p{javaWhitespace}]+$", "")));
     assertThat(Regexr.Trimr.order(), is(10000));
 
-    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String whitespacesR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.Trimr.pattern.matcher(s).matches()).collect(Collectors.joining());
+    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(Stringr::newString).collect(Collectors.joining());
+    String whitespacesR = IntStream.rangeClosed(0, 200_000).mapToObj(Stringr::newString).filter(s -> Regexr.Trimr.pattern.matcher(s).matches()).collect(Collectors.joining());
     assertThat(whitespacesR, is(whitespaces));
     assertThat(whitespacesR.codePoints().toArray(), is(whitespaces.codePoints().toArray()));
     assertThat(Regexr.Trimr.replaceAll(whitespaces), is(""));
@@ -291,15 +292,15 @@ public class RegexrTest {
 
     final Set<UnicodeBlock> unicodeBlocks = Arrays.asList(UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION, UnicodeBlock.HIRAGANA, UnicodeBlock.KATAKANA, UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS).stream().collect(Collectors.toSet());
     final Set<Integer> excludes = Arrays.asList(0xFF04, 0xFF5E, 0xFFE0, 0xFFE1, 0xFFE5, 0xFFE6).stream().collect(Collectors.toSet());
-    String halfwidthAndFullwidthForms = IntStream.rangeClosed(0, 200_000).filter(codePoint -> unicodeBlocks.contains(UnicodeBlock.of(codePoint))).filter(codePoint->!excludes.contains(codePoint)).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String halfwidthAndFullwidthFormsR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.CjkNormalizr.pattern.matcher(s).matches()).collect(Collectors.joining());
+    String halfwidthAndFullwidthForms = IntStream.rangeClosed(0, 200_000).filter(codePoint -> unicodeBlocks.contains(UnicodeBlock.of(codePoint))).filter(codePoint->!excludes.contains(codePoint)).mapToObj(Stringr::newString).collect(Collectors.joining());
+    String halfwidthAndFullwidthFormsR = IntStream.rangeClosed(0, 200_000).mapToObj(Stringr::newString).filter(s -> Regexr.CjkNormalizr.pattern.matcher(s).matches()).collect(Collectors.joining());
     assertThat(halfwidthAndFullwidthForms, is(halfwidthAndFullwidthFormsR));
     assertThat(halfwidthAndFullwidthForms.codePoints().toArray(), is(halfwidthAndFullwidthFormsR.codePoints().toArray()));
 
-    String uglified = IntStream.rangeClosed(0xFF00, 0xFFEF).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String uglified = IntStream.rangeClosed(0xFF00, 0xFFEF).mapToObj(Stringr::newString).collect(Collectors.joining());
     // @formatter:off
     String expect = uglified.codePoints()
-      .mapToObj(RegexrOrigin::newString)
+      .mapToObj(Stringr::newString)
       .map(s -> Normalizer.normalize(s, Form.NFKC)
         .replaceAll("\u0020?([\u3099])", "\u309B")
         .replaceAll("\u0020?([\u309A])", "\u309C")

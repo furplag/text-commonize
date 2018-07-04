@@ -24,8 +24,7 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
-import jp.furplag.text.regex.RegexrOrigin;
-import jp.furplag.text.regex.RegexrRecursive;
+import jp.furplag.text.optimize.Stringr;
 
 public class RegexrRecursiveTest {
 
@@ -57,7 +56,7 @@ public class RegexrRecursiveTest {
     assertThat(new RegexrRecursive("o\\s?n\\s?e", "壱").replaceAll("\t\t\to\nne\t\t\t"), is("\t\t\t壱\t\t\t"));
     assertThat(new RegexrRecursive("o\\s*n\\s*e", "壱").replaceAll("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"), is("\t\t\t壱\t\t\t"));
 
-    String spaces = IntStream.rangeClosed(Character.MIN_CODE_POINT, Character.MAX_CODE_POINT).filter(Character::isWhitespace).mapToObj(RegexrOrigin::newString).collect(Collectors.joining("\u0020"));
+    String spaces = IntStream.rangeClosed(Character.MIN_CODE_POINT, Character.MAX_CODE_POINT).filter(Character::isWhitespace).mapToObj(Stringr::newString).collect(Collectors.joining("\u0020"));
     assertThat(new RegexrRecursive("[\\p{javaWhitespace}]{2,}", "\u0020").replaceAll(spaces), is(" "));
   }
 }

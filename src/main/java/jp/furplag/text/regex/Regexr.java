@@ -26,6 +26,8 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jp.furplag.text.optimize.Stringr;
+
 /**
  * for text linting .
  *
@@ -73,7 +75,7 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
       @Override
       public String replaceAll(String string) {
         // @formatter:off
-        if (RegexrOrigin.isEmpty(string)) {
+        if (Stringr.isEmpty(string)) {
           return string;
         }
         String result = string
@@ -138,7 +140,7 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
   @Override
   public List<String> find(String string) {
     List<String> result = new ArrayList<>();
-    if (!RegexrOrigin.isEmpty(string)) {
+    if (!Stringr.isEmpty(string)) {
       Matcher matcher = pattern.matcher(string);
       while (matcher.find()) {
         result.add(matcher.group());
@@ -166,7 +168,7 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
    */
   @Override
   public boolean matches(String string) {
-    return !RegexrOrigin.isEmpty(string) && pattern.matcher(string).find();
+    return !Stringr.isEmpty(string) && pattern.matcher(string).find();
   }
 
   @Override
@@ -184,7 +186,7 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
    */
   @Override
   public String replaceAll(String string) {
-    return RegexrOrigin.isEmpty(string) ? string : pattern.matcher(string).replaceAll(replacement);
+    return Stringr.isEmpty(string) ? string : pattern.matcher(string).replaceAll(replacement);
   }
 
   /**

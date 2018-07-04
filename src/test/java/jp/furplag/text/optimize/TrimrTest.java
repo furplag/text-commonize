@@ -33,9 +33,6 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
-import jp.furplag.text.optimize.Trimr;
-import jp.furplag.text.regex.RegexrOrigin;
-
 public class TrimrTest {
 
   @Test
@@ -63,12 +60,12 @@ public class TrimrTest {
     assertThat(Trimr.trim("\tthe String.\t"), is("the String."));
     assertThat(Trimr.trim(" 　 the String. 　 "), is("the String."));
 
-    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(Stringr::newString).collect(Collectors.joining());
+    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(Stringr::newString).collect(Collectors.joining());
     Function<IntStream, String> randomizr = new Function<IntStream, String>() {
       @Override
       public String apply(IntStream t) {
-        return t.mapToObj(RegexrOrigin::newString).collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.joining());
+        return t.mapToObj(Stringr::newString).collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.joining());
       }
     };
 
@@ -94,12 +91,12 @@ public class TrimrTest {
     assertThat(Trimr.isTrimmed(" the String. "), is(false));
     assertThat(Trimr.isTrimmed(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n"))), is(true));
 
-    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(Stringr::newString).collect(Collectors.joining());
+    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(Stringr::newString).collect(Collectors.joining());
     Function<IntStream, String> randomizr = new Function<IntStream, String>() {
       @Override
       public String apply(IntStream t) {
-        List<String> list = t.mapToObj(RegexrOrigin::newString).collect(Collectors.toCollection(ArrayList::new));
+        List<String> list = t.mapToObj(Stringr::newString).collect(Collectors.toCollection(ArrayList::new));
         Collections.shuffle(list);
 
         return list.stream().collect(Collectors.joining());

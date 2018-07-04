@@ -28,10 +28,7 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
-import jp.furplag.text.regex.Regexr;
-import jp.furplag.text.regex.RegexrOrigin;
-import jp.furplag.text.regex.RegexrRecursive;
-import jp.furplag.text.regex.RegexrStandard;
+import jp.furplag.text.optimize.Stringr;
 
 public class RegexrOriginTest {
 
@@ -111,62 +108,62 @@ public class RegexrOriginTest {
   @Test
   public void testCodePoints() {
 
-    assertThat(RegexrOrigin.codePoints((String) null).toArray(), is(new int[] {}));
-    assertThat(RegexrOrigin.codePoints("").toArray(), is(new int[] {}));
-    assertThat(RegexrOrigin.codePoints((String[]) null).toArray(), is(new int[] {}));
-    assertThat(RegexrOrigin.codePoints(new String[] {}).toArray(), is(new int[] {}));
-    assertThat(RegexrOrigin.codePoints(new String[] {null, null}).toArray(), is(new int[] {}));
-    assertThat(RegexrOrigin.codePoints(new String[] {null, ""}).toArray(), is(new int[] {}));
-    assertThat(RegexrOrigin.codePoints(new String[] {"", ""}).toArray(), is(new int[] {}));
-    assertThat(RegexrOrigin.codePoints("南無阿弥陀仏").toArray(), is("南無阿弥陀仏".codePoints().toArray()));
-    assertThat(RegexrOrigin.codePoints("諸行無常", null, "", " ", "盛者必衰").toArray(), is("諸行無常 盛者必衰".codePoints().toArray()));
+    assertThat(Stringr.codePoints((String) null).toArray(), is(new int[] {}));
+    assertThat(Stringr.codePoints("").toArray(), is(new int[] {}));
+    assertThat(Stringr.codePoints((String[]) null).toArray(), is(new int[] {}));
+    assertThat(Stringr.codePoints(new String[] {}).toArray(), is(new int[] {}));
+    assertThat(Stringr.codePoints(new String[] {null, null}).toArray(), is(new int[] {}));
+    assertThat(Stringr.codePoints(new String[] {null, ""}).toArray(), is(new int[] {}));
+    assertThat(Stringr.codePoints(new String[] {"", ""}).toArray(), is(new int[] {}));
+    assertThat(Stringr.codePoints("南無阿弥陀仏").toArray(), is("南無阿弥陀仏".codePoints().toArray()));
+    assertThat(Stringr.codePoints("諸行無常", null, "", " ", "盛者必衰").toArray(), is("諸行無常 盛者必衰".codePoints().toArray()));
   }
 
   @Test
   public void testIsEmpty() {
-    assertThat(RegexrOrigin.isEmpty((String) null), is(true));
-    assertThat(RegexrOrigin.isEmpty(""), is(true));
-    assertThat(RegexrOrigin.isEmpty("\u0000"), is(false));
-    assertThat(RegexrOrigin.isEmpty("\t\r\n\u0020"), is(false));
-    assertThat(RegexrOrigin.isEmpty("南無阿弥陀仏"), is(false));
+    assertThat(Stringr.isEmpty((String) null), is(true));
+    assertThat(Stringr.isEmpty(""), is(true));
+    assertThat(Stringr.isEmpty("\u0000"), is(false));
+    assertThat(Stringr.isEmpty("\t\r\n\u0020"), is(false));
+    assertThat(Stringr.isEmpty("南無阿弥陀仏"), is(false));
 
-    assertThat(RegexrOrigin.isEmpty((String[]) null), is(true));
-    assertThat(RegexrOrigin.isEmpty(new String[] {}), is(true));
-    assertThat(RegexrOrigin.isEmpty(new String[] {null}), is(true));
-    assertThat(RegexrOrigin.isEmpty(null, null), is(true));
-    assertThat(RegexrOrigin.isEmpty(null, ""), is(true));
-    assertThat(RegexrOrigin.isEmpty("", null), is(true));
-    assertThat(RegexrOrigin.isEmpty("", ""), is(true));
-    assertThat(RegexrOrigin.isEmpty("宇", null), is(false));
-    assertThat(RegexrOrigin.isEmpty(null, "宙"), is(false));
-    assertThat(RegexrOrigin.isEmpty("南無阿弥陀仏".split("")), is(false));
+    assertThat(Stringr.isEmpty((String[]) null), is(true));
+    assertThat(Stringr.isEmpty(new String[] {}), is(true));
+    assertThat(Stringr.isEmpty(new String[] {null}), is(true));
+    assertThat(Stringr.isEmpty(null, null), is(true));
+    assertThat(Stringr.isEmpty(null, ""), is(true));
+    assertThat(Stringr.isEmpty("", null), is(true));
+    assertThat(Stringr.isEmpty("", ""), is(true));
+    assertThat(Stringr.isEmpty("宇", null), is(false));
+    assertThat(Stringr.isEmpty(null, "宙"), is(false));
+    assertThat(Stringr.isEmpty("南無阿弥陀仏".split("")), is(false));
   }
 
   @Test
   public void testNewString() {
-    assertThat(RegexrOrigin.newString(-1), is(""));
-    assertThat(RegexrOrigin.newString(-1, 21163), is("劫"));
-    assertThat(RegexrOrigin.newString(0), is("\u0000"));
-    assertThat(RegexrOrigin.newString("南無阿弥陀仏".codePoints().toArray()), is("南無阿弥陀仏"));
+    assertThat(Stringr.newString(-1), is(""));
+    assertThat(Stringr.newString(-1, 21163), is("劫"));
+    assertThat(Stringr.newString(0), is("\u0000"));
+    assertThat(Stringr.newString("南無阿弥陀仏".codePoints().toArray()), is("南無阿弥陀仏"));
 
-    assertThat(RegexrOrigin.newString(IntStream.rangeClosed(-128, 128).toArray()), is(RegexrOrigin.newString(IntStream.rangeClosed(0, 128).toArray())));
+    assertThat(Stringr.newString(IntStream.rangeClosed(-128, 128).toArray()), is(Stringr.newString(IntStream.rangeClosed(0, 128).toArray())));
   }
 
   @Test
   public void testJoin() {
-    assertThat(RegexrOrigin.join((String) null), is(""));
-    assertThat(RegexrOrigin.join(""), is(""));
-    assertThat(RegexrOrigin.join((String[]) null), is(""));
-    assertThat(RegexrOrigin.join(new String[] {}), is(""));
-    assertThat(RegexrOrigin.join(new String[] {null}), is(""));
-    assertThat(RegexrOrigin.join(null, null), is(""));
-    assertThat(RegexrOrigin.join(null, ""), is(""));
-    assertThat(RegexrOrigin.join("", null), is(""));
-    assertThat(RegexrOrigin.join("", ""), is(""));
+    assertThat(Stringr.join((String) null), is(""));
+    assertThat(Stringr.join(""), is(""));
+    assertThat(Stringr.join((String[]) null), is(""));
+    assertThat(Stringr.join(new String[] {}), is(""));
+    assertThat(Stringr.join(new String[] {null}), is(""));
+    assertThat(Stringr.join(null, null), is(""));
+    assertThat(Stringr.join(null, ""), is(""));
+    assertThat(Stringr.join("", null), is(""));
+    assertThat(Stringr.join("", ""), is(""));
 
-    assertThat(RegexrOrigin.join("三千", "世界"), is("三千世界"));
-    assertThat(RegexrOrigin.join("", "色即是空"), is("色即是空"));
-    assertThat(RegexrOrigin.join("諸行無常", null, "", " ", "盛者必衰"), is("諸行無常 盛者必衰"));
+    assertThat(Stringr.join("三千", "世界"), is("三千世界"));
+    assertThat(Stringr.join("", "色即是空"), is("色即是空"));
+    assertThat(Stringr.join("諸行無常", null, "", " ", "盛者必衰"), is("諸行無常 盛者必衰"));
   }
 
   @Test
@@ -179,12 +176,12 @@ public class RegexrOriginTest {
     assertThat(RegexrOrigin.anyMatch("色不異空", null, null, null), is(false));
     assertThat(RegexrOrigin.anyMatch("色不異空", new Regexr[]{}), is(false));
     assertThat(RegexrOrigin.anyMatch("色不異空", new Regexr[]{null}), is(false));
-    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("[空不異色]", RegexrOrigin.newString(128591))), is(true));
-    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("色", RegexrOrigin.newString(128591))), is(true));
-    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("[空不異色]", RegexrOrigin.newString(128591)), new RegexrStandard("[一切苦厄]", RegexrOrigin.newString(128591))), is(true));
-    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("[諸行無常]", RegexrOrigin.newString(128591)), new RegexrStandard("[一切苦厄]", RegexrOrigin.newString(128591))), is(false));
-    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("[空不異色]", RegexrOrigin.newString(128591)), new RegexrRecursive("[一切苦厄]", RegexrOrigin.newString(128591))), is(true));
-    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("[諸行無常]", RegexrOrigin.newString(128591)), new RegexrRecursive("[一切苦厄]", RegexrOrigin.newString(128591))), is(false));
+    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("[空不異色]", Stringr.newString(128591))), is(true));
+    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("色", Stringr.newString(128591))), is(true));
+    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("[空不異色]", Stringr.newString(128591)), new RegexrStandard("[一切苦厄]", Stringr.newString(128591))), is(true));
+    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("[諸行無常]", Stringr.newString(128591)), new RegexrStandard("[一切苦厄]", Stringr.newString(128591))), is(false));
+    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("[空不異色]", Stringr.newString(128591)), new RegexrRecursive("[一切苦厄]", Stringr.newString(128591))), is(true));
+    assertThat(RegexrOrigin.anyMatch("色不異空", new RegexrStandard("[諸行無常]", Stringr.newString(128591)), new RegexrRecursive("[一切苦厄]", Stringr.newString(128591))), is(false));
   }
 
   @Test
@@ -197,10 +194,10 @@ public class RegexrOriginTest {
     assertThat(RegexrOrigin.findAny("色不異空", null, null, null), is(Collections.EMPTY_LIST));
     assertThat(RegexrOrigin.findAny("色不異空", new Regexr[]{}), is(Collections.EMPTY_LIST));
     assertThat(RegexrOrigin.findAny("色不異空", new Regexr[]{null}), is(Collections.EMPTY_LIST));
-    assertThat(RegexrOrigin.findAny("色不異空", new RegexrStandard("[空不異色]", RegexrOrigin.newString(128591))), is(Arrays.asList("色不異空".split(""))));
-    assertThat(RegexrOrigin.findAny("色不異空", new RegexrStandard("色", RegexrOrigin.newString(128591))), is(Arrays.asList("色")));
-    assertThat(RegexrOrigin.findAny("色不異空", new RegexrStandard("[空不異色]", RegexrOrigin.newString(128591)), new RegexrRecursive("[一切苦厄]", RegexrOrigin.newString(128591))), is(Arrays.asList("色不異空".split(""))));
-    assertThat(RegexrOrigin.findAny("色不異空", new RegexrStandard("[諸行無常]", RegexrOrigin.newString(128591)), new RegexrRecursive("[一切苦厄]", RegexrOrigin.newString(128591))), is(Collections.EMPTY_LIST));
+    assertThat(RegexrOrigin.findAny("色不異空", new RegexrStandard("[空不異色]", Stringr.newString(128591))), is(Arrays.asList("色不異空".split(""))));
+    assertThat(RegexrOrigin.findAny("色不異空", new RegexrStandard("色", Stringr.newString(128591))), is(Arrays.asList("色")));
+    assertThat(RegexrOrigin.findAny("色不異空", new RegexrStandard("[空不異色]", Stringr.newString(128591)), new RegexrRecursive("[一切苦厄]", Stringr.newString(128591))), is(Arrays.asList("色不異空".split(""))));
+    assertThat(RegexrOrigin.findAny("色不異空", new RegexrStandard("[諸行無常]", Stringr.newString(128591)), new RegexrRecursive("[一切苦厄]", Stringr.newString(128591))), is(Collections.EMPTY_LIST));
   }
 
   @Test
@@ -213,9 +210,9 @@ public class RegexrOriginTest {
     assertThat(RegexrOrigin.replaceAll("色即是空", new Regexr[]{null}), is("色即是空"));
     assertThat(RegexrOrigin.replaceAll("色即是空", Regexr.Trimr, Regexr.CtrlRemovr), is("色即是空"));
     assertThat(RegexrOrigin.replaceAll("色即是空", new RegexrStandard("色即是空", "空即是色")), is("空即是色"));
-    assertThat(RegexrOrigin.replaceAll("色即是空", new RegexrStandard("[色即是空]", RegexrOrigin.newString(128591)), new RegexrRecursive("[\\x{1F64F}]{2,}", RegexrOrigin.newString(128591))), is("🙏"));
-    assertThat(RegexrOrigin.replaceAll("色即是空", new RegexrStandard("[色即是空]", RegexrOrigin.newString(128520)), new RegexrRecursive("[\\x{1F64F}]{2,}", RegexrOrigin.newString(128591))), is("😈😈😈😈"));
-    assertThat(RegexrOrigin.replaceAll("色即是空", new RegexrStandard("[色即是空]", RegexrOrigin.newString(128520)), new RegexrStandard("[\\x{1F608}]", RegexrOrigin.newString(128591)), new RegexrRecursive("[\\x{1F64F}]{2,}", RegexrOrigin.newString(128591))), is("🙏"));
-    assertThat(RegexrOrigin.replaceAll("色即是空", new RegexrStandard("[色即是空]+", RegexrOrigin.newString(128591))), is("🙏"));
+    assertThat(RegexrOrigin.replaceAll("色即是空", new RegexrStandard("[色即是空]", Stringr.newString(128591)), new RegexrRecursive("[\\x{1F64F}]{2,}", Stringr.newString(128591))), is("🙏"));
+    assertThat(RegexrOrigin.replaceAll("色即是空", new RegexrStandard("[色即是空]", Stringr.newString(128520)), new RegexrRecursive("[\\x{1F64F}]{2,}", Stringr.newString(128591))), is("😈😈😈😈"));
+    assertThat(RegexrOrigin.replaceAll("色即是空", new RegexrStandard("[色即是空]", Stringr.newString(128520)), new RegexrStandard("[\\x{1F608}]", Stringr.newString(128591)), new RegexrRecursive("[\\x{1F64F}]{2,}", Stringr.newString(128591))), is("🙏"));
+    assertThat(RegexrOrigin.replaceAll("色即是空", new RegexrStandard("[色即是空]+", Stringr.newString(128591))), is("🙏"));
   }
 }

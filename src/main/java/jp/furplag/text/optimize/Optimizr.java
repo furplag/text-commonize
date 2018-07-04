@@ -46,7 +46,7 @@ public final class Optimizr {
   public static boolean isOptimized(final String string) {
     Regexr[] regexrs = {Regexr.CtrlRemovr, Regexr.SpaceLintr, Regexr.LinefeedLintr, Regexr.Trimr};
 
-    return RegexrOrigin.isEmpty(string) || !RegexrOrigin.anyMatch(string, regexrs);
+    return Stringr.isEmpty(string) || !RegexrOrigin.anyMatch(string, regexrs);
   }
 
   /**

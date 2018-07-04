@@ -32,9 +32,6 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
-import jp.furplag.text.optimize.Optimizr;
-import jp.furplag.text.regex.RegexrOrigin;
-
 public class OptimizrTest {
 
   @Test
@@ -76,12 +73,12 @@ public class OptimizrTest {
     assertThat(Optimizr.isOptimized(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n"))), is(true));
     assertThat(Optimizr.isOptimized(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n\n"))), is(false));
 
-    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(Stringr::newString).collect(Collectors.joining());
+    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(Stringr::newString).collect(Collectors.joining());
     Function<IntStream, String> randomizr = new Function<IntStream, String>() {
       @Override
       public String apply(IntStream t) {
-        List<String> list = t.mapToObj(RegexrOrigin::newString).collect(Collectors.toCollection(ArrayList::new));
+        List<String> list = t.mapToObj(Stringr::newString).collect(Collectors.toCollection(ArrayList::new));
         Collections.shuffle(list);
 
         return list.stream().collect(Collectors.joining());

@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jp.furplag.text.optimize.Stringr;
 import jp.furplag.text.regex.RegexrOrigin;
 import jp.furplag.text.regex.RegexrStandard;
 
@@ -56,7 +57,7 @@ public final class Kanizr {
    * @return Hiraganized text
    */
   public static String hiraganize(final String string) {
-    return RegexrOrigin.isEmpty(string) ? string :
+    return Stringr.isEmpty(string) ? string :
       RegexrOrigin.replaceAll(
         Hiraganizr.kanize(string)
       , new RegexrStandard("\\x{30F7}", "\u308F\u309B")
@@ -111,11 +112,11 @@ public final class Kanizr {
    */
   private String kanize(String string) {
       // @formatter:off
-      return RegexrOrigin.isEmpty(string) ? string :
+      return Stringr.isEmpty(string) ? string :
         Optional.ofNullable(CjkNormalizr.normalize(string)).orElse("")
           .codePoints()
           .map(this::translate)
-          .mapToObj(RegexrOrigin::newString)
+          .mapToObj(Stringr::newString)
           .collect(Collectors.joining())
         ;
       // @formatter:on
