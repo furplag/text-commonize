@@ -20,7 +20,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>jp.furplag.sandbox</groupId>
   <artifactId>text-commonize</artifactId>
-  <version>2.0.0</version>
+  <version>2.0.1-SNAPSHOT</version>
   <inceptionYear>2017</inceptionYear>
   <name>${project.artifactId}</name>
   <description>optimized Unicode normalization for using under standard input text .</description>
@@ -34,7 +34,11 @@
   </licenses>
   <organization />
   <developers>
-    <developer />
+    <developer>
+      <id>${developer.name}</id>
+      <name>${developer.name}</name>
+      <url>${developer.url}</url>
+    </developer>
   </developers>
   <scm>
     <url>${project.url}</url>
@@ -49,6 +53,10 @@
       <url>file://${project.build.directory}/mvn-repo</url>
     </repository>
   </distributionManagement>
+  <issueManagement>
+    <url>${project.url}/issues</url>
+    <system>GitHub Issues</system>
+  </issueManagement>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -66,12 +74,19 @@
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
+        <checksumPolicy>always</checksumPolicy>
       </snapshots>
     </repository>
 
   </repositories>
 
   <dependencies>
+
+    <dependency>
+      <groupId>jp.furplag.sandbox</groupId>
+      <artifactId>relic</artifactId>
+      <version>1.0.1</version>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -81,10 +96,18 @@
     </dependency>
 
     <dependency>
-      <groupId>jp.furplag.sandbox</groupId>
-      <artifactId>relic</artifactId>
-      <version>1.0.1</version>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-launcher</artifactId>
+      <version>1.1.1</version>
+      <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>5.1.1</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -105,16 +128,55 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <locale>en_US</locale>
+          <author>${developer.name}</author>
+          <extension>true</extension>
+          <bottom>${javadoc.bottom}</bottom>
+          <additionalJOptions>
+            <additionalJOption>-J-Duser.language=en</additionalJOption>
+            <additionalJOption>-J-Duse.country=US</additionalJOption>
+            <additionalparam>-Xdoclint:none</additionalparam>
+          </additionalJOptions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.20</version>
+        <version>2.19.1</version>
         <configuration>
           <argLine>${jacocoArgs} -Dfile.encoding=UTF-8</argLine>
         </configuration>
         <dependencies>
           <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>surefire-junit47</artifactId>
-            <version>2.20</version>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-surefire-provider</artifactId>
+            <version>1.1.1</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -122,7 +184,12 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.7.9</version>
+        <version>0.8.1</version>
+        <configuration>
+          <excludes>
+            <exclude>**/**/_*.*</exclude>
+          </excludes>
+        </configuration>
         <executions>
           <execution>
             <id>prepare-agent</id>
@@ -132,9 +199,6 @@
             </goals>
             <configuration>
               <propertyName>jacocoArgs</propertyName>
-              <includes>
-                <include>*</include>
-              </includes>
             </configuration>
           </execution>
           <execution>
@@ -148,12 +212,19 @@
       </plugin>
 
       <plugin>
-          <groupId>org.eluder.coveralls</groupId>
-          <artifactId>coveralls-maven-plugin</artifactId>
-          <version>4.3.0</version>
-          <configuration>
-              <repoToken>${coveralls.text-commonize.repoToken}</repoToken>
-          </configuration>
+        <groupId>org.eluder.coveralls</groupId>
+        <artifactId>coveralls-maven-plugin</artifactId>
+        <version>4.3.0</version>
+        <configuration>
+          <repoToken>${coveralls.text-commonize.repoToken}</repoToken>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+          </dependency>
+        </dependencies>
       </plugin>
 
       <plugin>
@@ -170,6 +241,7 @@
             <exclude>**/.licenseHeader</exclude>
             <exclude>**/LICENSE</exclude>
             <exclude>**/.*</exclude>
+            <exclude>**/*.config</exclude>
             <exclude>**/*.yaml</exclude>
             <exclude>**/*.yml</exclude>
             <exclude>src/test/resources/**</exclude>
@@ -220,7 +292,6 @@
           <repositoryOwner>${developer.name}</repositoryOwner>
         </configuration>
         <executions>
-          <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
           <execution>
             <goals>
               <goal>site</goal>
@@ -231,18 +302,6 @@
       </plugin>
 
     </plugins>
-
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
-
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-      </testResource>
-    </testResources>
 
   </build>
 

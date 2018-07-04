@@ -16,7 +16,6 @@
 
 package jp.furplag.text.optimize;
 
-import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Constructor;
@@ -32,53 +31,55 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
+import jp.furplag.text.regex.RegexrOrigin;
+
 public class OptimizrTest {
 
   @Test
   public void test() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     Constructor<?> c = Optimizr.class.getDeclaredConstructor();
     c.setAccessible(true);
-    assertThat(c.newInstance() instanceof Optimizr, is(true));
+    assertTrue(c.newInstance() instanceof Optimizr);
   }
 
   @Test
   public void testOptimize() {
-    assertThat(Optimizr.optimize(null), is((String) null));
-    assertThat(Optimizr.optimize(""), is(""));
-    assertThat(Optimizr.optimize("theString."), is("theString."));
-    assertThat(Optimizr.optimize("the String."), is("the String."));
-    assertThat(Optimizr.optimize("the String ."), is("the String ."));
-    assertThat(Optimizr.optimize("the String. "), is("the String."));
-    assertThat(Optimizr.optimize(" the String."), is("the String."));
-    assertThat(Optimizr.optimize(" the String. "), is("the String."));
-    assertThat(Optimizr.optimize("   the String.   "), is("the String."));
-    assertThat(Optimizr.optimize(" \u0010 the String. \u0002 "), is("the String."));
-    assertThat(Optimizr.optimize("\n\n\nthe String.\n\n\n"), is("the String."));
-    assertThat(Optimizr.optimize("\nthe String.\n"), is("the String."));
-    assertThat(Optimizr.optimize("\t\t\tthe String.\t\t\t"), is("the String."));
-    assertThat(Optimizr.optimize("\tthe String.\t"), is("the String."));
-    assertThat(Optimizr.optimize(" 　 the String. 　 "), is("the String."));
+    assertNull(Optimizr.optimize(null));
+    assertEquals("", Optimizr.optimize(""));
+    assertEquals("theString.", Optimizr.optimize("theString."));
+    assertEquals("the String.", Optimizr.optimize("the String."));
+    assertEquals("the String .", Optimizr.optimize("the String ."));
+    assertEquals("the String.", Optimizr.optimize("the String. "));
+    assertEquals("the String.", Optimizr.optimize(" the String."));
+    assertEquals("the String.", Optimizr.optimize(" the String. "));
+    assertEquals("the String.", Optimizr.optimize("   the String.   "));
+    assertEquals("the String.", Optimizr.optimize(" \u0010 the String. \u0002 "));
+    assertEquals("the String.", Optimizr.optimize("\n\n\nthe String.\n\n\n"));
+    assertEquals("the String.", Optimizr.optimize("\nthe String.\n"));
+    assertEquals("the String.", Optimizr.optimize("\t\t\tthe String.\t\t\t"));
+    assertEquals("the String.", Optimizr.optimize("\tthe String.\t"));
+    assertEquals("the String.", Optimizr.optimize(" 　 the String. 　 "));
   }
 
   @Test
   public void testIsOptimized() {
-    assertThat(Optimizr.isOptimized(null), is(true));
-    assertThat(Optimizr.isOptimized(""), is(true));
-    assertThat(Optimizr.isOptimized("theString."), is(true));
-    assertThat(Optimizr.isOptimized("the String."), is(true));
-    assertThat(Optimizr.isOptimized("the String ."), is(true));
-    assertThat(Optimizr.isOptimized("the String. "), is(false));
-    assertThat(Optimizr.isOptimized(" the String."), is(false));
-    assertThat(Optimizr.isOptimized(" the String. "), is(false));
-    assertThat(Optimizr.isOptimized(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n"))), is(true));
-    assertThat(Optimizr.isOptimized(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n\n"))), is(false));
+    assertTrue(Optimizr.isOptimized(null));
+    assertTrue(Optimizr.isOptimized(""));
+    assertTrue(Optimizr.isOptimized("theString."));
+    assertTrue(Optimizr.isOptimized("the String."));
+    assertTrue(Optimizr.isOptimized("the String ."));
+    assertFalse(Optimizr.isOptimized("the String. "));
+    assertFalse(Optimizr.isOptimized(" the String."));
+    assertFalse(Optimizr.isOptimized(" the String. "));
+    assertTrue(Optimizr.isOptimized(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n"))));
+    assertFalse(Optimizr.isOptimized(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n\n"))));
 
-    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(Stringr::newString).collect(Collectors.joining());
-    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(Stringr::newString).collect(Collectors.joining());
+    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
     Function<IntStream, String> randomizr = new Function<IntStream, String>() {
       @Override
       public String apply(IntStream t) {
-        List<String> list = t.mapToObj(Stringr::newString).collect(Collectors.toCollection(ArrayList::new));
+        List<String> list = t.mapToObj(RegexrOrigin::newString).collect(Collectors.toCollection(ArrayList::new));
         Collections.shuffle(list);
 
         return list.stream().collect(Collectors.joining());
@@ -90,8 +91,8 @@ public class OptimizrTest {
       String uglified = randomizr.apply((ctrls + whitespaces).codePoints());
       uglified += string;
       uglified += randomizr.apply((ctrls + whitespaces).codePoints());
-      assertThat(Optimizr.isOptimized(uglified), is(false));
-      assertThat(Optimizr.isOptimized(Optimizr.optimize(uglified)), is(true));
+      assertFalse(Optimizr.isOptimized(uglified));
+      assertTrue(Optimizr.isOptimized(Optimizr.optimize(uglified)));
     });
   }
 }

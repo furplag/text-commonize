@@ -36,7 +36,7 @@ public final class Trimr {
    * @return true if the specified string is trimmed
    */
   public static boolean isTrimmed(final String string) {
-    return Stringr.isEmpty(string) || !RegexrOrigin.anyMatch(string, regexrs);
+    return RegexrOrigin.isEmpty(string) || !RegexrOrigin.anyMatch(string, regexrs);
   }
 
   /**

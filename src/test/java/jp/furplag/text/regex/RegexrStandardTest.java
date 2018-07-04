@@ -16,20 +16,16 @@
 
 package jp.furplag.text.regex;
 
-import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-
-import jp.furplag.text.regex.Regexr;
-import jp.furplag.text.regex.RegexrStandard;
 
 public class RegexrStandardTest {
 
   @Test
   public void test() {
-    assertThat(new RegexrStandard(null, null), is(new Regexr(null, null, 0){}));
+    assertEquals(new Regexr(null, null, 0){}, new RegexrStandard(null, null));
 
-    assertThat(new RegexrStandard(null, null).order(), is(0));
+    assertEquals(0, new RegexrStandard(null, null).order());
   }
 }

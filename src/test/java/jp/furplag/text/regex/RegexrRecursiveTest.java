@@ -16,7 +16,6 @@
 
 package jp.furplag.text.regex;
 
-import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.util.stream.Collectors;
@@ -24,39 +23,37 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
-import jp.furplag.text.optimize.Stringr;
-
 public class RegexrRecursiveTest {
 
   @Test
   public void test() {
-    assertThat(new RegexrRecursive(null, null), is(new RegexrRecursive(null, null)));
+    assertEquals(new RegexrRecursive(null, null), new RegexrRecursive(null, null));
 
-    assertThat(new RegexrRecursive(null, null).order(), is(0));
+    assertEquals(0, new RegexrRecursive(null, null).order());
   }
 
 
   @Test
   public void testReplaceAll() {
-    assertThat(new RegexrRecursive("one", "壱").replaceAll(null), is((String) null));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll(""), is(""));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("1"), is("1"));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("o ne"), is("o ne"));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("One"), is("One"));
-    assertThat(new RegexrRecursive("[Oo]ne", "壱").replaceAll("One"), is("壱"));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("\t\t\to\tne\t\t\t"), is("\t\t\to\tne\t\t\t"));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("\t\t\to\nne\t\t\t"), is("\t\t\to\nne\t\t\t"));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("one"), is("壱"));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("one two three"), is("壱 two three"));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("three two one zero"), is("three two 壱 zero"));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("three\ntwo\none\nzero"), is("three\ntwo\n壱\nzero"));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("oneoneoneoneone"), is("壱壱壱壱壱"));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("neoneoneoneoneo"), is("ne壱壱壱壱o"));
-    assertThat(new RegexrRecursive("one", "壱").replaceAll("\t\t\tone\t\t\t"), is("\t\t\t壱\t\t\t"));
-    assertThat(new RegexrRecursive("o\\s?n\\s?e", "壱").replaceAll("\t\t\to\nne\t\t\t"), is("\t\t\t壱\t\t\t"));
-    assertThat(new RegexrRecursive("o\\s*n\\s*e", "壱").replaceAll("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"), is("\t\t\t壱\t\t\t"));
+    assertNull(new RegexrRecursive("one", "壱").replaceAll(null));
+    assertEquals("", new RegexrRecursive("one", "壱").replaceAll(""));
+    assertEquals("1", new RegexrRecursive("one", "壱").replaceAll("1"));
+    assertEquals("o ne", new RegexrRecursive("one", "壱").replaceAll("o ne"));
+    assertEquals("One", new RegexrRecursive("one", "壱").replaceAll("One"));
+    assertEquals("壱", new RegexrRecursive("[Oo]ne", "壱").replaceAll("One"));
+    assertEquals("\t\t\to\tne\t\t\t", new RegexrRecursive("one", "壱").replaceAll("\t\t\to\tne\t\t\t"));
+    assertEquals("\t\t\to\nne\t\t\t", new RegexrRecursive("one", "壱").replaceAll("\t\t\to\nne\t\t\t"));
+    assertEquals("壱", new RegexrRecursive("one", "壱").replaceAll("one"));
+    assertEquals("壱 two three", new RegexrRecursive("one", "壱").replaceAll("one two three"));
+    assertEquals("three two 壱 zero", new RegexrRecursive("one", "壱").replaceAll("three two one zero"));
+    assertEquals("three\ntwo\n壱\nzero", new RegexrRecursive("one", "壱").replaceAll("three\ntwo\none\nzero"));
+    assertEquals("壱壱壱壱壱", new RegexrRecursive("one", "壱").replaceAll("oneoneoneoneone"));
+    assertEquals("ne壱壱壱壱o", new RegexrRecursive("one", "壱").replaceAll("neoneoneoneoneo"));
+    assertEquals("\t\t\t壱\t\t\t", new RegexrRecursive("one", "壱").replaceAll("\t\t\tone\t\t\t"));
+    assertEquals("\t\t\t壱\t\t\t", new RegexrRecursive("o\\s?n\\s?e", "壱").replaceAll("\t\t\to\nne\t\t\t"));
+    assertEquals("\t\t\t壱\t\t\t", new RegexrRecursive("o\\s*n\\s*e", "壱").replaceAll("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"));
 
-    String spaces = IntStream.rangeClosed(Character.MIN_CODE_POINT, Character.MAX_CODE_POINT).filter(Character::isWhitespace).mapToObj(Stringr::newString).collect(Collectors.joining("\u0020"));
-    assertThat(new RegexrRecursive("[\\p{javaWhitespace}]{2,}", "\u0020").replaceAll(spaces), is(" "));
+    String spaces = IntStream.rangeClosed(Character.MIN_CODE_POINT, Character.MAX_CODE_POINT).filter(Character::isWhitespace).mapToObj(RegexrOrigin::newString).collect(Collectors.joining("\u0020"));
+    assertEquals(" ", new RegexrRecursive("[\\p{javaWhitespace}]{2,}", "\u0020").replaceAll(spaces));
   }
 }

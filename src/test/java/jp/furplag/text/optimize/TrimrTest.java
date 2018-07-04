@@ -16,7 +16,6 @@
 
 package jp.furplag.text.optimize;
 
-import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Constructor;
@@ -33,39 +32,41 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
+import jp.furplag.text.regex.RegexrOrigin;
+
 public class TrimrTest {
 
   @Test
   public void test() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     Constructor<?> c = Trimr.class.getDeclaredConstructor();
     c.setAccessible(true);
-    assertThat(c.newInstance() instanceof Trimr, is(true));
+    assertTrue(c.newInstance() instanceof Trimr);
   }
 
   @Test
   public void testTrim() {
-    assertThat(Trimr.trim(null), is((String) null));
-    assertThat(Trimr.trim(""), is(""));
-    assertThat(Trimr.trim("theString."), is("theString."));
-    assertThat(Trimr.trim("the String."), is("the String."));
-    assertThat(Trimr.trim("the String ."), is("the String ."));
-    assertThat(Trimr.trim("the String. "), is("the String."));
-    assertThat(Trimr.trim(" the String."), is("the String."));
-    assertThat(Trimr.trim(" the String. "), is("the String."));
-    assertThat(Trimr.trim("   the String.   "), is("the String."));
-    assertThat(Trimr.trim(" \u0010 the String. \u0002 "), is("the String."));
-    assertThat(Trimr.trim("\n\n\nthe String.\n\n\n"), is("the String."));
-    assertThat(Trimr.trim("\nthe String.\n"), is("the String."));
-    assertThat(Trimr.trim("\t\t\tthe String.\t\t\t"), is("the String."));
-    assertThat(Trimr.trim("\tthe String.\t"), is("the String."));
-    assertThat(Trimr.trim(" 　 the String. 　 "), is("the String."));
+    assertNull(Trimr.trim(null));
+    assertEquals("", Trimr.trim(""));
+    assertEquals("theString.", Trimr.trim("theString."));
+    assertEquals("the String.", Trimr.trim("the String."));
+    assertEquals("the String .", Trimr.trim("the String ."));
+    assertEquals("the String.", Trimr.trim("the String. "));
+    assertEquals("the String.", Trimr.trim(" the String."));
+    assertEquals("the String.", Trimr.trim(" the String. "));
+    assertEquals("the String.", Trimr.trim("   the String.   "));
+    assertEquals("the String.", Trimr.trim(" \u0010 the String. \u0002 "));
+    assertEquals("the String.", Trimr.trim("\n\n\nthe String.\n\n\n"));
+    assertEquals("the String.", Trimr.trim("\nthe String.\n"));
+    assertEquals("the String.", Trimr.trim("\t\t\tthe String.\t\t\t"));
+    assertEquals("the String.", Trimr.trim("\tthe String.\t"));
+    assertEquals("the String.", Trimr.trim(" 　 the String. 　 "));
 
-    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(Stringr::newString).collect(Collectors.joining());
-    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(Stringr::newString).collect(Collectors.joining());
+    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
     Function<IntStream, String> randomizr = new Function<IntStream, String>() {
       @Override
       public String apply(IntStream t) {
-        return t.mapToObj(Stringr::newString).collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.joining());
+        return t.mapToObj(RegexrOrigin::newString).collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.joining());
       }
     };
 
@@ -75,28 +76,28 @@ public class TrimrTest {
       uglified += string;
       uglified += randomizr.apply((ctrls + whitespaces).codePoints());
 
-      assertThat(Trimr.trim(uglified), is(string));
+      assertEquals(string, Trimr.trim(uglified));
     });
   }
 
   @Test
   public void testIsTrimmed() {
-    assertThat(Trimr.isTrimmed(null), is(true));
-    assertThat(Trimr.isTrimmed(""), is(true));
-    assertThat(Trimr.isTrimmed("theString."), is(true));
-    assertThat(Trimr.isTrimmed("the String."), is(true));
-    assertThat(Trimr.isTrimmed("the String ."), is(true));
-    assertThat(Trimr.isTrimmed("the String. "), is(false));
-    assertThat(Trimr.isTrimmed(" the String."), is(false));
-    assertThat(Trimr.isTrimmed(" the String. "), is(false));
-    assertThat(Trimr.isTrimmed(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n"))), is(true));
+    assertTrue(Trimr.isTrimmed(null));
+    assertTrue(Trimr.isTrimmed(""));
+    assertTrue(Trimr.isTrimmed("theString."));
+    assertTrue(Trimr.isTrimmed("the String."));
+    assertTrue(Trimr.isTrimmed("the String ."));
+    assertFalse(Trimr.isTrimmed("the String. "));
+    assertFalse(Trimr.isTrimmed(" the String."));
+    assertFalse(Trimr.isTrimmed(" the String. "));
+    assertTrue(Trimr.isTrimmed(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n"))));
 
-    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(Stringr::newString).collect(Collectors.joining());
-    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(Stringr::newString).collect(Collectors.joining());
+    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
     Function<IntStream, String> randomizr = new Function<IntStream, String>() {
       @Override
       public String apply(IntStream t) {
-        List<String> list = t.mapToObj(Stringr::newString).collect(Collectors.toCollection(ArrayList::new));
+        List<String> list = t.mapToObj(RegexrOrigin::newString).collect(Collectors.toCollection(ArrayList::new));
         Collections.shuffle(list);
 
         return list.stream().collect(Collectors.joining());
@@ -108,8 +109,8 @@ public class TrimrTest {
       String uglified = randomizr.apply((ctrls + whitespaces).codePoints());
       uglified += string;
       uglified += randomizr.apply((ctrls + whitespaces).codePoints());
-      assertThat(Trimr.isTrimmed(uglified), is(false));
-      assertThat(Trimr.isTrimmed(Trimr.trim(uglified)), is(true));
+      assertFalse(Trimr.isTrimmed(uglified));
+      assertTrue(Trimr.isTrimmed(Trimr.trim(uglified)));
     });
   }
 

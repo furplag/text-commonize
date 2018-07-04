@@ -16,7 +16,6 @@
 
 package jp.furplag.text.normalize;
 
-import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.lang.Character.UnicodeBlock;
@@ -30,7 +29,7 @@ import org.junit.Test;
 
 import jp.furplag.sandbox.reflect.SavageReflection;
 import jp.furplag.text.optimize.Optimizr;
-import jp.furplag.text.optimize.Stringr;
+import jp.furplag.text.regex.RegexrOrigin;
 
 public class CjkNormalizrTest {
 
@@ -38,76 +37,77 @@ public class CjkNormalizrTest {
   public void test() throws SecurityException, ReflectiveOperationException {
     Constructor<?> c = CjkNormalizr.class.getDeclaredConstructor();
     c.setAccessible(true);
-    assertThat(c.newInstance() instanceof CjkNormalizr, is(true));
+    assertTrue(c.newInstance() instanceof CjkNormalizr);
   }
 
   @Test
   public void testNormalize() {
-    assertThat(CjkNormalizr.normalize(null), is((String) null));
-    assertThat(CjkNormalizr.normalize(""), is(""));
-    assertThat(CjkNormalizr.normalize("Hello World."), is("Hello World."));
-    assertThat(CjkNormalizr.normalize("Ｈｅｌｌｏ　Ｗｏｒｌｄ．"), is("Hello World."));
-    assertThat(CjkNormalizr.normalize("こんにちは　世界"), is("こんにちは 世界"));
-    assertThat(CjkNormalizr.normalize("ｺﾝﾆﾁﾊ　世界"), is("コンニチハ 世界"));
-    assertThat(CjkNormalizr.normalize("コンニチハ　世界"), is("コンニチハ 世界"));
-    assertThat(CjkNormalizr.normalize("バーバパパ"), is("バーバパパ"));
-    assertThat(CjkNormalizr.normalize("ﾊﾞｰﾊﾞﾊﾟﾊﾟ"), is("バーバパパ"));
-    assertThat(CjkNormalizr.normalize("ハ゛ーハ゛ハ゜ハ゜"), is("バーバパパ"));
-    assertThat(CjkNormalizr.normalize("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
-    assertThat(CjkNormalizr.normalize("ワ゛ヰ゛ウ゛ヱ゛ヲ゛"), is("ヷヸヴヹヺ"));
-    assertThat(CjkNormalizr.normalize("ヷヸヴヹヺ"), is("ヷヸヴヹヺ"));
-    assertThat(CjkNormalizr.normalize("ｱﾟｲﾟｳﾟｴﾟｵﾟﾅﾞﾆﾞﾇﾞﾈﾞﾉﾞ"), is("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛"));
-    assertThat(CjkNormalizr.normalize("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"), is("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"));
-    assertThat(CjkNormalizr.normalize("あ゚い゚う゚え゚お゚な゙に゙ぬ゙ね゙の゙"), is("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"));
-    assertThat(CjkNormalizr.normalize("パ～やん"), is("パ～やん"));
+    assertNull(CjkNormalizr.normalize(null));
+    assertEquals("", CjkNormalizr.normalize(""));
+    assertEquals("Hello World.", CjkNormalizr.normalize("Hello World."));
+    assertEquals("Hello World.", CjkNormalizr.normalize("Ｈｅｌｌｏ　Ｗｏｒｌｄ．"));
+    assertEquals("こんにちは 世界", CjkNormalizr.normalize("こんにちは　世界"));
+    assertEquals("コンニチハ 世界", CjkNormalizr.normalize("ｺﾝﾆﾁﾊ　世界"));
+    assertEquals("コンニチハ 世界", CjkNormalizr.normalize("コンニチハ　世界"));
+    assertEquals("バーバパパ", CjkNormalizr.normalize("バーバパパ"));
+    assertEquals("バーバパパ", CjkNormalizr.normalize("ﾊﾞｰﾊﾞﾊﾟﾊﾟ"));
+    assertEquals("バーバパパ", CjkNormalizr.normalize("ハ゛ーハ゛ハ゜ハ゜"));
+    assertEquals("ヷヸヴヹヺ", CjkNormalizr.normalize("ヷヸヴヹヺ"));
+    assertEquals("ヷヸヴヹヺ", CjkNormalizr.normalize("ワ゛ヰ゛ウ゛ヱ゛ヲ゛"));
+    assertEquals("ヷヸヴヹヺ", CjkNormalizr.normalize("ヷヸヴヹヺ"));
+    assertEquals("ア゜イ゜ウ゜エ゜オ゜ナ゛ニ゛ヌ゛ネ゛ノ゛", CjkNormalizr.normalize("ｱﾟｲﾟｳﾟｴﾟｵﾟﾅﾞﾆﾞﾇﾞﾈﾞﾉﾞ"));
+    assertEquals("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛", CjkNormalizr.normalize("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"));
+    assertEquals("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛", CjkNormalizr.normalize("あ゚い゚う゚え゚お゚な゙に゙ぬ゙ね゙の゙"));
+    assertEquals("パ～やん", CjkNormalizr.normalize("パ～やん"));
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void testDenormalize() throws SecurityException, ReflectiveOperationException {
-    assertThat(CjkNormalizr.denormalize(null), is((String) null));
-    assertThat(CjkNormalizr.denormalize(""), is(""));
-    assertThat(CjkNormalizr.denormalize("   \r\n   \r\n   \r\n"), is(""));
-    assertThat(CjkNormalizr.denormalize("諸行無常"), is("諸行無常"));
-    assertThat(CjkNormalizr.denormalize("南\t無\t阿\t弥\t陀\t仏"), is("南 無 阿 弥 陀 仏"));
-    assertThat(CjkNormalizr.denormalize("Wanderlei Silva"), is("Ｗａｎｄｅｒｌｅｉ Ｓｉｌｖａ"));
-    assertThat(CjkNormalizr.denormalize("Ｗａｎｄｅｒｌｅｉ Ｓｉｌｖａ"), is("Ｗａｎｄｅｒｌｅｉ Ｓｉｌｖａ"));
+    assertNull(CjkNormalizr.denormalize(null));
+    assertEquals("", CjkNormalizr.denormalize(""));
+    assertEquals("", CjkNormalizr.denormalize("   \r\n   \r\n   \r\n"));
+    assertEquals("諸行無常", CjkNormalizr.denormalize("諸行無常"));
+    assertEquals("南　無　阿　弥　陀　仏", CjkNormalizr.denormalize("南\t無\t阿\t弥\t陀\t仏"));
+    assertEquals("Ｈｅｌｌｏ　Ｗｏｒｌｄ．", CjkNormalizr.denormalize("Hello World."));
+    assertEquals("Ｈｅｌｌｏ　Ｗｏｒｌｄ．", CjkNormalizr.denormalize("Ｈｅｌｌｏ　Ｗｏｒｌｄ．"));
 
     Map<Integer, Integer> exclusives = (Map<Integer, Integer>) SavageReflection.get(CjkNormalizr.class, "exclusives");
-    String latins = Stringr.newString(IntStream.rangeClosed(0, 0x00FF).toArray());
-    String expect = Optimizr.optimize(Stringr.newString(latins.codePoints().map(codePoint->exclusives.getOrDefault(codePoint, codePoint + (UnicodeBlock.BASIC_LATIN.equals(UnicodeBlock.of(codePoint)) && !Character.isWhitespace(codePoint) && !Character.isISOControl(codePoint) ? 65248 : 0))).toArray()));
-    assertThat(CjkNormalizr.denormalize(latins), is(expect));
+    String latins = RegexrOrigin.newString(IntStream.rangeClosed(0, 0x00FF).toArray());
+    String expect = Optimizr.optimize(RegexrOrigin.newString(latins.codePoints().map(codePoint->exclusives.getOrDefault(codePoint, codePoint + (UnicodeBlock.BASIC_LATIN.equals(UnicodeBlock.of(codePoint)) && !Character.isWhitespace(codePoint) && !Character.isISOControl(codePoint) ? 65248 : 0))).toArray())).replaceAll(" ", "　");
+    assertEquals(expect, CjkNormalizr.denormalize(latins));
   }
 
   @Test
   public void testIsNormalized() {
-    assertThat(CjkNormalizr.isNormalized(null), is(true));
-    assertThat(CjkNormalizr.isNormalized(""), is(true));
-    assertThat(CjkNormalizr.isNormalized("theString."), is(true));
-    assertThat(CjkNormalizr.isNormalized("the String."), is(true));
-    assertThat(CjkNormalizr.isNormalized("the String ."), is(true));
-    assertThat(CjkNormalizr.isNormalized("the String. "), is(false));
-    assertThat(CjkNormalizr.isNormalized(" the String."), is(false));
-    assertThat(CjkNormalizr.isNormalized(" the String. "), is(false));
-    assertThat(CjkNormalizr.isNormalized(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n"))), is(true));
-    assertThat(CjkNormalizr.isNormalized(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n\n"))), is(false));
-    assertThat(CjkNormalizr.isNormalized("Hello World."), is(true));
-    assertThat(CjkNormalizr.isNormalized("Ｈｅｌｌｏ　Ｗｏｒｌｄ．"), is(false));
-    assertThat(CjkNormalizr.isNormalized("こんにちは　世界"), is(false));
-    assertThat(CjkNormalizr.isNormalized("こんにちは 世界"), is(true));
-    assertThat(CjkNormalizr.isNormalized("ｺﾝﾆﾁﾊ　世界"), is(false));
-    assertThat(CjkNormalizr.isNormalized("コンニチハ　世界"), is(false));
-    assertThat(CjkNormalizr.isNormalized("コンニチハ 世界"), is(true));
-    assertThat(CjkNormalizr.isNormalized("バーバパパ"), is(true));
-    assertThat(CjkNormalizr.isNormalized("ﾊﾞｰﾊﾞﾊﾟﾊﾟ"), is(false));
-    assertThat(CjkNormalizr.isNormalized("ハ゛ーハ゛ハ゜ハ゜"), is(false));
-    assertThat(CjkNormalizr.isNormalized("ヷヸヴヹヺ"), is(true));
-    assertThat(CjkNormalizr.isNormalized("ワ゛ヰ゛ウ゛ヱ゛ヲ゛"), is(false));
-    assertThat(CjkNormalizr.isNormalized("ヷヸヴヹヺ"), is(false));
-    assertThat(CjkNormalizr.isNormalized("ｱﾟｲﾟｳﾟｴﾟｵﾟﾅﾞﾆﾞﾇﾞﾈﾞﾉﾞ"), is(false));
-    assertThat(CjkNormalizr.isNormalized("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"), is(true));
-    assertThat(CjkNormalizr.isNormalized("あ゚い゚う゚え゚お゚な゙に゙ぬ゙ね゙の゙"), is(false));
-    assertThat(CjkNormalizr.isNormalized("パ～やん"), is(true));
-    assertThat(CjkNormalizr.isNormalized("パ~やん"), is(true));
+    assertTrue(CjkNormalizr.isNormalized(null));
+    assertTrue(CjkNormalizr.isNormalized(""));
+    assertTrue(CjkNormalizr.isNormalized("theString."));
+    assertTrue(CjkNormalizr.isNormalized("the String."));
+    assertTrue(CjkNormalizr.isNormalized("the String ."));
+    assertFalse(CjkNormalizr.isNormalized("the String. "));
+    assertFalse(CjkNormalizr.isNormalized(" the String."));
+    assertFalse(CjkNormalizr.isNormalized(" the String. "));
+    assertTrue(CjkNormalizr.isNormalized(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n"))));
+    assertFalse(CjkNormalizr.isNormalized(Arrays.stream("theString.".split("")).collect(Collectors.joining("\n\n"))));
+    assertTrue(CjkNormalizr.isNormalized("Hello World."));
+    assertFalse(CjkNormalizr.isNormalized("Hello　World."));
+    assertFalse(CjkNormalizr.isNormalized("Ｈｅｌｌｏ　Ｗｏｒｌｄ．"));
+    assertFalse(CjkNormalizr.isNormalized("こんにちは　世界"));
+    assertTrue(CjkNormalizr.isNormalized("こんにちは 世界"));
+    assertFalse(CjkNormalizr.isNormalized("ｺﾝﾆﾁﾊ　世界"));
+    assertFalse(CjkNormalizr.isNormalized("コンニチハ　世界"));
+    assertTrue(CjkNormalizr.isNormalized("コンニチハ 世界"));
+    assertTrue(CjkNormalizr.isNormalized("バーバパパ"));
+    assertFalse(CjkNormalizr.isNormalized("ﾊﾞｰﾊﾞﾊﾟﾊﾟ"));
+    assertFalse(CjkNormalizr.isNormalized("ハ゛ーハ゛ハ゜ハ゜"));
+    assertTrue(CjkNormalizr.isNormalized("ヷヸヴヹヺ"));
+    assertFalse(CjkNormalizr.isNormalized("ワ゛ヰ゛ウ゛ヱ゛ヲ゛"));
+    assertFalse(CjkNormalizr.isNormalized("ヷヸヴヹヺ"));
+    assertFalse(CjkNormalizr.isNormalized("ｱﾟｲﾟｳﾟｴﾟｵﾟﾅﾞﾆﾞﾇﾞﾈﾞﾉﾞ"));
+    assertTrue(CjkNormalizr.isNormalized("あ゜い゜う゜え゜お゜な゛に゛ぬ゛ね゛の゛"));
+    assertFalse(CjkNormalizr.isNormalized("あ゚い゚う゚え゚お゚な゙に゙ぬ゙ね゙の゙"));
+    assertTrue(CjkNormalizr.isNormalized("パ～やん"));
+    assertTrue(CjkNormalizr.isNormalized("パ~やん"));
   }
 }
