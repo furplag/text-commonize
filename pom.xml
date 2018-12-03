@@ -20,7 +20,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>jp.furplag.sandbox</groupId>
   <artifactId>text-commonize</artifactId>
-  <version>2.1.0</version>
+  <version>2.1.1</version>
   <inceptionYear>2017</inceptionYear>
   <name>${project.artifactId}</name>
   <description>optimized Unicode normalization for using under standard input text .</description>
@@ -85,7 +85,7 @@
     <dependency>
       <groupId>jp.furplag.sandbox</groupId>
       <artifactId>relic</artifactId>
-      <version>2.0.0</version>
+      <version>2.1.0</version>
     </dependency>
 
     <dependency>
