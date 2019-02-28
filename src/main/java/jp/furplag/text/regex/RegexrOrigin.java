@@ -90,7 +90,7 @@ public interface RegexrOrigin {
    * @return the joined string, return empty string if null array input.
    */
   static String join(final String... strings) {
-    return Streamr.Filter.filtering(Streamr.Filter.FilteringMode.And, strings, (t) -> !Objects.toString(t, "").isEmpty()).collect(Collectors.joining());
+    return Streamr.Filter.filtering(strings, (t) -> !Objects.toString(t, "").isEmpty()).collect(Collectors.joining());
   }
 
   /**
