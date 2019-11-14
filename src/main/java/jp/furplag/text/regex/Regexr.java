@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jp.furplag.text.regex;
 
 import java.io.Serializable;
@@ -34,30 +33,30 @@ import java.util.regex.Pattern;
  */
 public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<RegexrOrigin> {
 
-  /** remove Control Character. */
+  /** remove Control Character . */
   public static final Regexr CtrlRemovr;
 
-  /** replace whitespaces to space. */
+  /** replace whitespaces to space . */
   public static final Regexr SpaceNormalizr;
 
-  /** replace a sequence of spaces with a single spaces. */
+  /** replace a sequence of spaces with a single spaces . */
   public static final Regexr SpaceLintr;
 
-  /** remove empty rows. */
+  /** remove empty rows . */
   public static final Regexr LinefeedLintr;
 
-  /** remove leading and trailing space. */
+  /** remove leading and trailing space . */
   public static final Regexr Trimr;
 
   /**
    * modified normalization for CJK text .
    *
    * <p>
-   * normalize the character member of Halfwidth and Fullwidth Forms uning {@link Form#NFKC}.
+   * normalize the character member of Halfwidth and Fullwidth Forms uning {@link Form#NFKC} .
    * </p>
    * <ul>
    * <li>CJK half width character replace to full width mostly ( Hangul, Katakana, Hiragana ) .</li>
-   * <li>CJK full width character replace to Latin or single byte character, if those are convertible.</li>
+   * <li>CJK full width character replace to Latin or single byte character, if those are convertible .</li>
    * </ul>
    *
    */
@@ -95,20 +94,21 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
     };
   }
 
-  /** regular expression compiled into a pattern */
+  /** regular expression compiled into a pattern . */
   protected final Pattern pattern;
 
-  /** the replacement string */
+  /** the replacement string . */
   protected final String replacement;
 
-  /** the replacement string */
+  /** the order in replecing . */
   protected final int order;
 
   /**
-   * shorthand for {@code Pattern.compile(regex).matcher(text).replaceAll(replacement)}.
+   * shorthand for {@code Pattern.compile(regex).matcher(text).replaceAll(replacement)} .
    *
    * @param regex the regular expression
    * @param replacement The replacement string, set empty string if this parameter is null
+   * @param order the order in replecing
    */
   protected Regexr(String regex, String replacement, int order) {
     this.pattern = Pattern.compile(Objects.toString(regex, "^\\x{0000}$"));
@@ -116,25 +116,19 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
     this.order = order < 0 ? 0 : order;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public int compareTo(RegexrOrigin o) {
     return o == null ? 1 : Integer.valueOf(this.order()).compareTo(o.order());
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public boolean equals(Object obj) {
     return this == obj || (obj instanceof Regexr && this.toString().equals(((Regexr) obj).toString()));
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public List<String> find(String string) {
     List<String> result = new ArrayList<>();
@@ -148,9 +142,7 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -161,42 +153,33 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
     return result;
   }
 
-  /**
-   * returns evalute result that {@link Matcher#find()} .
-   */
+  /** {@inheritDoc} */
   @Override
   public boolean matches(String string) {
     return !RegexrOrigin.isEmpty(string) && pattern.matcher(string).find();
   }
 
+  /** {@inheritDoc} */
   @Override
   public final int order() {
     return order;
   }
 
+  /** {@inheritDoc} */
   @Override
   public Pattern pattern() {
     return pattern;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public String replaceAll(String string) {
     return RegexrOrigin.isEmpty(string) ? string : pattern.matcher(string).replaceAll(replacement);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public String toString() {
-    // @formatter:off
-    return new StringJoiner(", ", "{", "}")
-      .add("pattern: " + Objects.toString(pattern))
-      .add("replacement: " + Objects.toString(replacement))
-      .toString();
-    // @formatter:on
+    return new StringJoiner(", ", "{", "}").add("pattern: " + Objects.toString(pattern)).add("replacement: " + Objects.toString(replacement)).toString();
   }
 }

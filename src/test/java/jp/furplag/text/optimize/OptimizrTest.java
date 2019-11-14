@@ -16,8 +16,10 @@
 
 package jp.furplag.text.optimize;
 
-import static org.junit.Assert.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -28,41 +30,20 @@ import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import jp.furplag.text.regex.RegexrOrigin;
 
 public class OptimizrTest {
 
   @Test
-  public void test() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+  void test() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     Constructor<?> c = Optimizr.class.getDeclaredConstructor();
     c.setAccessible(true);
     assertTrue(c.newInstance() instanceof Optimizr);
   }
 
   @Test
-  public void testOptimize() {
-    assertNull(Optimizr.optimize(null));
-    assertEquals("", Optimizr.optimize(""));
-    assertEquals("theString.", Optimizr.optimize("theString."));
-    assertEquals("the String.", Optimizr.optimize("the String."));
-    assertEquals("the String .", Optimizr.optimize("the String ."));
-    assertEquals("the String.", Optimizr.optimize("the String. "));
-    assertEquals("the String.", Optimizr.optimize(" the String."));
-    assertEquals("the String.", Optimizr.optimize(" the String. "));
-    assertEquals("the String.", Optimizr.optimize("   the String.   "));
-    assertEquals("the String.", Optimizr.optimize(" \u0010 the String. \u0002 "));
-    assertEquals("the String.", Optimizr.optimize("\n\n\nthe String.\n\n\n"));
-    assertEquals("the String.", Optimizr.optimize("\nthe String.\n"));
-    assertEquals("the String.", Optimizr.optimize("\t\t\tthe String.\t\t\t"));
-    assertEquals("the String.", Optimizr.optimize("\tthe String.\t"));
-    assertEquals("the String.", Optimizr.optimize(" 　 the String. 　 "));
-  }
-
-  @Test
-  public void testIsOptimized() {
+  void testIsOptimized() {
     assertTrue(Optimizr.isOptimized(null));
     assertTrue(Optimizr.isOptimized(""));
     assertTrue(Optimizr.isOptimized("theString."));
@@ -94,5 +75,24 @@ public class OptimizrTest {
       assertFalse(Optimizr.isOptimized(uglified));
       assertTrue(Optimizr.isOptimized(Optimizr.optimize(uglified)));
     });
+  }
+
+  @Test
+  void testOptimize() {
+    assertNull(Optimizr.optimize(null));
+    assertEquals("", Optimizr.optimize(""));
+    assertEquals("theString.", Optimizr.optimize("theString."));
+    assertEquals("the String.", Optimizr.optimize("the String."));
+    assertEquals("the String .", Optimizr.optimize("the String ."));
+    assertEquals("the String.", Optimizr.optimize("the String. "));
+    assertEquals("the String.", Optimizr.optimize(" the String."));
+    assertEquals("the String.", Optimizr.optimize(" the String. "));
+    assertEquals("the String.", Optimizr.optimize("   the String.   "));
+    assertEquals("the String.", Optimizr.optimize(" \u0010 the String. \u0002 "));
+    assertEquals("the String.", Optimizr.optimize("\n\n\nthe String.\n\n\n"));
+    assertEquals("the String.", Optimizr.optimize("\nthe String.\n"));
+    assertEquals("the String.", Optimizr.optimize("\t\t\tthe String.\t\t\t"));
+    assertEquals("the String.", Optimizr.optimize("\tthe String.\t"));
+    assertEquals("the String.", Optimizr.optimize(" 　 the String. 　 "));
   }
 }

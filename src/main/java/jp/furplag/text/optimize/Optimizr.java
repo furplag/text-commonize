@@ -38,6 +38,11 @@ public final class Optimizr {
   private static final Regexr[] regexrs = {Regexr.CtrlRemovr, Regexr.SpaceNormalizr, Regexr.SpaceLintr, Regexr.LinefeedLintr, Regexr.Trimr};
 
   /**
+   * Optimizr instances should NOT be constructed in standard programming.
+   */
+  private Optimizr() {}
+
+  /**
    * detects whether the specified string is optimized.
    *
    * @param string the string, maybe null
@@ -65,9 +70,4 @@ public final class Optimizr {
   public static String optimize(final String string) {
     return RegexrOrigin.replaceAll(string, regexrs);
   }
-
-  /**
-   * Optimizr instances should NOT be constructed in standard programming.
-   */
-  private Optimizr() {}
 }

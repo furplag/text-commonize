@@ -60,7 +60,7 @@ public interface RegexrOrigin {
   }
 
   /**
-   * returns matched elements any of {@code regexrs} of the given string.
+   * returns matched elements any of {@code regexrs} of the given string .
    *
    * @param string the string, maybe null
    * @param regexrs {@link Regexr Regexr(s)}
@@ -81,13 +81,13 @@ public interface RegexrOrigin {
   }
 
   /**
-   * joins the elements of the provided array into a single String containing the provided list of elements.
+   * joins the elements of the provided array into a single String containing the provided list of elements .
    * <p>
-   * Null objects within the array are represented by empty strings.
+   * Null objects within the array are represented by empty strings .
    * </p>
    *
    * @param strings the string(s), maybe null
-   * @return the joined string, return empty string if null array input.
+   * @return the joined string, return empty string if null array input
    */
   static String join(final String... strings) {
     return Streamr.Filter.filtering(strings, (t) -> !Objects.toString(t, "").isEmpty()).collect(Collectors.joining());
@@ -97,7 +97,7 @@ public interface RegexrOrigin {
    * shorthand for {@code new String(((int[]) codePoints), 0, codePoints.length)} .
    *
    * @param codePoints Array that is the source of Unicode code points
-   * @return the string represented by Unicode code points.
+   * @return the string represented by Unicode code points
    * @see {@link String#String(int[], int, int)}
    */
   static String newString(final int... codePoints) {
@@ -107,7 +107,7 @@ public interface RegexrOrigin {
   }
 
   /**
-   * shorthand for {@code regexrs.foreach(r->r.replaceAll(string))}.
+   * shorthand for {@code regexrs.foreach(r->r.replaceAll(string))} .
    *
    * @param string the string, maybe null
    * @param regexrs {@link Regexr Regexr(s)}
@@ -155,7 +155,7 @@ public interface RegexrOrigin {
   }
 
   /**
-   * replaces every subsequence of the input sequence that matches the pattern with the given replacement string.
+   * replaces every subsequence of the input sequence that matches the pattern with the given replacement string .
    *
    * @param string the string
    * @return the string constructed by replacing each matching subsequence by the replacement string

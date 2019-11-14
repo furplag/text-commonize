@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jp.furplag.text.optimize;
 
 import jp.furplag.text.regex.Regexr;
@@ -28,6 +27,11 @@ import jp.furplag.text.regex.RegexrOrigin;
 public final class Trimr {
 
   private static final Regexr[] regexrs = {Regexr.CtrlRemovr, Regexr.Trimr};
+
+  /**
+   * Trimr instances should NOT be constructed in standard programming.
+   */
+  private Trimr() {}
 
   /**
    * detects whether the specified string is trimmed.
@@ -48,9 +52,4 @@ public final class Trimr {
   public static String trim(final String string) {
     return RegexrOrigin.replaceAll(string, regexrs);
   }
-
-  /**
-   * Trimr instances should NOT be constructed in standard programming.
-   */
-  private Trimr() {}
 }
