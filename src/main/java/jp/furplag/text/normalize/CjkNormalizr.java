@@ -1,4 +1,3 @@
-
 /**
  * Copyright (C) 2017+ furplag (https://github.com/furplag)
  *
@@ -15,15 +14,23 @@
  * limitations under the License.
  */
 
+/**
+ * Copyright (C) 2017+ furplag (https://github.com/furplag)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+
 package jp.furplag.text.normalize;
 
 import java.lang.Character.UnicodeBlock;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import jp.furplag.sandbox.stream.Streamr;
 import jp.furplag.text.optimize.Optimizr;
 import jp.furplag.text.regex.Regexr;
 import jp.furplag.text.regex.RegexrOrigin;
@@ -46,19 +53,15 @@ import jp.furplag.text.regex.RegexrOrigin;
 public final class CjkNormalizr {
 
   /** the amount of add to Unicode code point of the target character. */
-  private static final int differenceOfCodepoint;
+  private static final int differenceOfCodepoint = "！".codePointAt(0) - "!".codePointAt(0);
 
-  /** exclude characters from translate. */
-  private static final Map<Integer, Integer> exclusives;
-  static {
-    // @formatter:off
-    differenceOfCodepoint = "！".codePointAt(0) - "!".codePointAt(0);
-    Map<Integer, Integer> _exclusives = new HashMap<>();
-      Arrays.stream(new Integer[][]{{0xFF65, 0x00B7}, {0xFFE0, 0x00A2}, {0xFFE1, 0x00A3}, {0xFFE2, 0x00AC}, {0xFFE3, 0x00AF}, {0xFFE4, 0x00A6}, {0xFFE5, 0x20A9}, {0xFFE6, 0x00A5}, {0xFFE8, 0x2502}})
-      .forEach(e->_exclusives.put(e[1], e[0]));
-    // @formatter:on
-    exclusives = Collections.unmodifiableMap(_exclusives);
-  }
+  /** exclude characters from translate. *//* @formatter:off */
+  private static final Map<Integer, Integer> exclusives =
+    Streamr.stream(new Integer[][]{
+      {0xFF65, 0x00B7}, {0xFFE0, 0x00A2}, {0xFFE1, 0x00A3}, {0xFFE2, 0x00AC}, {0xFFE3, 0x00AF}, {0xFFE4, 0x00A6}, {0xFFE5, 0x20A9}, {0xFFE6, 0x00A5}, {0xFFE8, 0x2502}
+    })
+    .collect(Collectors.toUnmodifiableMap((k) -> k[1], (v) -> v[0], (a, b) -> b));
+  /* @formatter:on */
 
   /**
    * returns denormalized string for using under standard input text .
@@ -119,8 +122,6 @@ public final class CjkNormalizr {
   }
 
 
-  /**
-   * CjkNormalizr instances should NOT be constructed in standard programming.
-   */
+  /** CjkNormalizr instances should NOT be constructed in standard programming. */
   private CjkNormalizr() {}
 }

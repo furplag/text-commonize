@@ -16,14 +16,13 @@
 
 package jp.furplag.text.regex;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class RegexrStandardTest {
 
   @Test
-  public void test() {
+  void test() {
     assertEquals(new Regexr(null, null, 0){}, new RegexrStandard(null, null));
 
     assertEquals(0, new RegexrStandard(null, null).order());

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jp.furplag.text.regex;
 
 /**
@@ -24,10 +23,21 @@ package jp.furplag.text.regex;
  */
 public class RegexrStandard extends Regexr {
 
+  /**
+   *
+   * @param regex the regular expression
+   * @param replacement The replacement string, set empty string if this parameter is null
+   */
   public RegexrStandard(String regex, String replacement) {
     super(regex, replacement, 0);
   }
 
+  /**
+   *
+   * @param regex the regular expression
+   * @param replacement The replacement string, set empty string if this parameter is null
+   * @param order the order in replecing
+   */
   public RegexrStandard(String regex, String replacement, int order) {
     super(regex, replacement, order);
   }

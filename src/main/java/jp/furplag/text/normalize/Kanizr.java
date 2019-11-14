@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jp.furplag.text.normalize;
 
 import java.lang.Character.UnicodeBlock;
@@ -49,33 +48,6 @@ public final class Kanizr {
     Katakanizr = new Kanizr(UnicodeBlock.HIRAGANA, -differenceOfCodepoint, 12352, 12439, 12440, 12441, 12442, 12443, 12444, 12447);
   }
 
-  /**
-   * Katakana convert to Hiragana .
-   *
-   * @param string the String, maybe null
-   * @return Hiraganized text
-   */
-  public static String hiraganize(final String string) {
-    return RegexrOrigin.isEmpty(string) ? string :
-      RegexrOrigin.replaceAll(
-        Hiraganizr.kanize(string)
-      , new RegexrStandard("\\x{30F7}", "\u308F\u309B")
-      , new RegexrStandard("\\x{30F8}", "\u3090\u309B")
-      , new RegexrStandard("\\x{30F9}", "\u3091\u309B")
-      , new RegexrStandard("\\x{30FA}", "\u3092\u309B")
-      );
-  }
-
-  /**
-   * Hiragana convert to Katakana .
-   *
-   * @param string the String, maybe null
-   * @return Katakanized text
-   */
-  public static String katakanize(final String string) {
-    return Katakanizr.kanize(string);
-  }
-
   /** Unicode code block to convert. */
   private final UnicodeBlock targetCodeBlock;
 
@@ -94,13 +66,28 @@ public final class Kanizr {
   private Kanizr(UnicodeBlock targetCodeBlock, int gap, int... exclusions) {
     this.targetCodeBlock = Objects.requireNonNull(targetCodeBlock);
     this.gap = gap;
-    // @formatter:off
-    this.exclusions =
-      Collections.unmodifiableSet(
-        Arrays.stream(Optional.ofNullable(exclusions).orElse(new int[] {}))
-          .mapToObj(Integer::valueOf).collect(Collectors.toSet())
-      );
-    // @formatter:on
+    this.exclusions = Collections.unmodifiableSet(Arrays.stream(Optional.ofNullable(exclusions).orElse(new int[] {})).mapToObj(Integer::valueOf).collect(Collectors.toSet()));
+  }
+
+  /**
+   * Katakana convert to Hiragana .
+   *
+   * @param string the String, maybe null
+   * @return Hiraganized text
+   */
+  public static String hiraganize(final String string) {
+    return RegexrOrigin.isEmpty(string) ? string
+        : RegexrOrigin.replaceAll(Hiraganizr.kanize(string), new RegexrStandard("\\x{30F7}", "\u308F\u309B"), new RegexrStandard("\\x{30F8}", "\u3090\u309B"), new RegexrStandard("\\x{30F9}", "\u3091\u309B"), new RegexrStandard("\\x{30FA}", "\u3092\u309B"));
+  }
+
+  /**
+   * Hiragana convert to Katakana .
+   *
+   * @param string the String, maybe null
+   * @return Katakanized text
+   */
+  public static String katakanize(final String string) {
+    return Katakanizr.kanize(string);
   }
 
   /**
@@ -110,7 +97,7 @@ public final class Kanizr {
    * @return converted text
    */
   private String kanize(String string) {
-      // @formatter:off
+    // @formatter:off
       return RegexrOrigin.isEmpty(string) ? string :
         Optional.ofNullable(CjkNormalizr.normalize(string)).orElse("")
           .codePoints()

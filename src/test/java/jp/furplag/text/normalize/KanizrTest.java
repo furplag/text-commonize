@@ -16,14 +16,14 @@
 
 package jp.furplag.text.normalize;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.Test;
 
 public class KanizrTest {
 
   @Test
-  public void testHiraganize() {
+  void testHiraganize() {
     assertNull(Kanizr.hiraganize(null));
     assertEquals("", Kanizr.hiraganize(""));
     assertEquals("Hello World.", Kanizr.hiraganize("Hello World."));
@@ -46,7 +46,7 @@ public class KanizrTest {
   }
 
   @Test
-  public void testKatakanize() {
+  void testKatakanize() {
     assertNull(Kanizr.katakanize(null));
     assertEquals("", Kanizr.katakanize(""));
     assertEquals("Hello World.", Kanizr.katakanize("Hello World."));
@@ -67,5 +67,4 @@ public class KanizrTest {
     assertEquals("パ～ヤン", Kanizr.katakanize("パ～やん"));
     assertEquals("アレン・ギンズバーグ", Kanizr.katakanize("ｱﾚﾝ･ｷﾞﾝｽﾞﾊﾞｰｸﾞ"));
   }
-
 }

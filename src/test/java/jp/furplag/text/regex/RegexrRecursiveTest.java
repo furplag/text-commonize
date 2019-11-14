@@ -13,28 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jp.furplag.text.regex;
 
-import static org.junit.Assert.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RegexrRecursiveTest {
 
   @Test
-  public void test() {
+  void test() {
     assertEquals(new RegexrRecursive(null, null), new RegexrRecursive(null, null));
 
     assertEquals(0, new RegexrRecursive(null, null).order());
   }
 
-
   @Test
-  public void testReplaceAll() {
+  void testReplaceAll() {
     assertNull(new RegexrRecursive("one", "壱").replaceAll(null));
     assertEquals("", new RegexrRecursive("one", "壱").replaceAll(""));
     assertEquals("1", new RegexrRecursive("one", "壱").replaceAll("1"));

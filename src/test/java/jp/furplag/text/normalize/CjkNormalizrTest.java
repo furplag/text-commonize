@@ -16,17 +16,17 @@
 
 package jp.furplag.text.normalize;
 
-import static org.junit.Assert.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.lang.Character.UnicodeBlock;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import jp.furplag.sandbox.reflect.SavageReflection;
 import jp.furplag.text.optimize.Optimizr;
 import jp.furplag.text.regex.RegexrOrigin;
@@ -34,14 +34,14 @@ import jp.furplag.text.regex.RegexrOrigin;
 public class CjkNormalizrTest {
 
   @Test
-  public void test() throws SecurityException, ReflectiveOperationException {
+  void test() throws SecurityException, ReflectiveOperationException {
     Constructor<?> c = CjkNormalizr.class.getDeclaredConstructor();
     c.setAccessible(true);
     assertTrue(c.newInstance() instanceof CjkNormalizr);
   }
 
   @Test
-  public void testNormalize() {
+  void testNormalize() {
     assertNull(CjkNormalizr.normalize(null));
     assertEquals("", CjkNormalizr.normalize(""));
     assertEquals("Hello World.", CjkNormalizr.normalize("Hello World."));
@@ -63,7 +63,7 @@ public class CjkNormalizrTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void testDenormalize() throws SecurityException, ReflectiveOperationException {
+  void testDenormalize() throws SecurityException, ReflectiveOperationException {
     assertNull(CjkNormalizr.denormalize(null));
     assertEquals("", CjkNormalizr.denormalize(""));
     assertEquals("", CjkNormalizr.denormalize("   \r\n   \r\n   \r\n"));
@@ -79,7 +79,7 @@ public class CjkNormalizrTest {
   }
 
   @Test
-  public void testIsNormalized() {
+  void testIsNormalized() {
     assertTrue(CjkNormalizr.isNormalized(null));
     assertTrue(CjkNormalizr.isNormalized(""));
     assertTrue(CjkNormalizr.isNormalized("theString."));

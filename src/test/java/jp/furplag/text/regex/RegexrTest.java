@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jp.furplag.text.regex;
 
-import static org.junit.Assert.*;
-
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import java.lang.Character.UnicodeBlock;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
@@ -29,16 +32,14 @@ import java.util.function.IntPredicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import jp.furplag.sandbox.reflect.SavageReflection;
 import jp.furplag.sandbox.stream.Streamr;
 
 public class RegexrTest {
 
   @Test
-  public void test() {
+  void test() {
     // @formatter:off
     assertTrue(new Regexr(null,  null, 0){} instanceof Regexr);
 
@@ -70,12 +71,12 @@ public class RegexrTest {
       }
 
       @Override
-      public String replaceAll(String string) {
+      public Pattern pattern() {
         return null;
       }
 
       @Override
-      public Pattern pattern() {
+      public String replaceAll(String string) {
         return null;
       }
     };
@@ -109,189 +110,14 @@ public class RegexrTest {
   }
 
   @Test
-  public void testMatches() {
-    assertFalse((new Regexr("one", "壱", 1) {}).matches(null));
-    assertFalse((new Regexr("one", "壱", 1) {}).matches(""));
-    assertFalse((new Regexr("one", "壱", 1) {}).matches("1"));
-    assertFalse((new Regexr("one", "壱", 1) {}).matches("o ne"));
-    assertFalse((new Regexr("one", "壱", 1) {}).matches("One"));
-    assertFalse((new Regexr("one", "壱", 1) {}).matches("\t\t\to\tne\t\t\t"));
-    assertFalse((new Regexr("one", "壱", 1) {}).matches("\t\t\to\nne\t\t\t"));
-    assertTrue((new Regexr("one", "壱", 1) {}).matches("one"));
-    assertTrue((new Regexr("one", "壱", 1) {}).matches("one two three"));
-    assertTrue((new Regexr("one", "壱", 1) {}).matches("three two one zero"));
-    assertTrue((new Regexr("one", "壱", 1) {}).matches("three\ntwo\none\nzero"));
-    assertTrue((new Regexr("one", "壱", 1) {}).matches("oneoneoneoneone"));
-    assertTrue((new Regexr("one", "壱", 1) {}).matches("neoneoneoneoneo"));
-    assertTrue((new Regexr("one", "壱", 1) {}).matches("\t\t\tone\t\t\t"));
-    assertTrue((new Regexr("o\\s?n\\s?e", "壱", 1) {}).matches("\t\t\to\nne\t\t\t"));
-    assertTrue((new Regexr("o\\s*n\\s*e", "壱", 1) {}).matches("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"));
-  }
-
-  @Test
-  public void testFind() {
-    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find(null));
-    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find(""));
-    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find("1"));
-    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find("o ne"));
-    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find("One"));
-    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find("\t\t\to\tne\t\t\t"));
-    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find("\t\t\to\nne\t\t\t"));
-    assertEquals(Arrays.asList("one"), (new Regexr("one", "壱", 1) {}).find("one"));
-    assertEquals(Arrays.asList("one"), (new Regexr("one", "壱", 1) {}).find("one two three"));
-    assertEquals(Arrays.asList("one"), (new Regexr("one", "壱", 1) {}).find("three two one zero"));
-    assertEquals(Arrays.asList("one"), (new Regexr("one", "壱", 1) {}).find("three\ntwo\none\nzero"));
-    assertEquals(Arrays.asList("one", "one", "one", "one", "one"), (new Regexr("one", "壱", 1) {}).find("oneoneoneoneone"));
-    assertEquals(Arrays.asList("one", "one", "one", "one"), (new Regexr("one", "壱", 1) {}).find("neoneoneoneoneo"));
-    assertEquals(Arrays.asList("one"), (new Regexr("one", "壱", 1) {}).find("\t\t\tone\t\t\t"));
-    assertEquals(Arrays.asList("o\nne"), (new Regexr("o\\s?n\\s?e", "壱", 1) {}).find("\t\t\to\nne\t\t\t"));
-    assertEquals(Arrays.asList("o\nn\t\t\t\n\t\t\te"), (new Regexr("o\\s*n\\s*e", "壱", 1) {}).find("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"));
-    assertEquals(Arrays.asList("o", "n", "e"), (new Regexr("[one]", "壱", 1) {}).find("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"));
-  }
-
-  @Test
-  public void testReplaceAll() {
-    assertNull((new Regexr("one", "壱", 1) {}).replaceAll(null));
-    assertEquals("", (new Regexr("one", "壱", 1) {}).replaceAll(""));
-    assertEquals("1", (new Regexr("one", "壱", 1) {}).replaceAll("1"));
-    assertEquals("o ne", (new Regexr("one", "壱", 1) {}).replaceAll("o ne"));
-    assertEquals("One", (new Regexr("one", "壱", 1) {}).replaceAll("One"));
-    assertEquals("壱", (new Regexr("[Oo]ne", "壱", 1) {}).replaceAll("One"));
-    assertEquals("\t\t\to\tne\t\t\t", (new Regexr("one", "壱", 1) {}).replaceAll("\t\t\to\tne\t\t\t"));
-    assertEquals("\t\t\to\nne\t\t\t", (new Regexr("one", "壱", 1) {}).replaceAll("\t\t\to\nne\t\t\t"));
-    assertEquals("壱", (new Regexr("one", "壱", 1) {}).replaceAll("one"));
-    assertEquals("壱 two three", (new Regexr("one", "壱", 1) {}).replaceAll("one two three"));
-    assertEquals("three two 壱 zero", (new Regexr("one", "壱", 1) {}).replaceAll("three two one zero"));
-    assertEquals("three\ntwo\n壱\nzero", (new Regexr("one", "壱", 1) {}).replaceAll("three\ntwo\none\nzero"));
-    assertEquals("壱壱壱壱壱", (new Regexr("one", "壱", 1) {}).replaceAll("oneoneoneoneone"));
-    assertEquals("ne壱壱壱壱o", (new Regexr("one", "壱", 1) {}).replaceAll("neoneoneoneoneo"));
-    assertEquals("\t\t\t壱\t\t\t", (new Regexr("one", "壱", 1) {}).replaceAll("\t\t\tone\t\t\t"));
-    assertEquals("\t\t\t壱\t\t\t", (new Regexr("o\\s?n\\s?e", "壱", 1) {}).replaceAll("\t\t\to\nne\t\t\t"));
-    assertEquals("\t\t\t壱\t\t\t", (new Regexr("o\\s*n\\s*e", "壱", 1) {}).replaceAll("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"));
-  }
-
-  @Test
-  public void testCtrlRemovr() {
-    assertEquals(new RegexrStandard("[\\p{Cc}&&[^\\s\\x{001C}-\\x{001F}]]", ""), Regexr.CtrlRemovr);
-    assertEquals(0, Regexr.CtrlRemovr.order());
-
-    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String ctrlsR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.CtrlRemovr.pattern.matcher(s).matches()).collect(Collectors.joining());
-    assertArrayEquals(ctrls.codePoints().toArray(), ctrlsR.codePoints().toArray());
-    assertEquals(ctrls, ctrlsR);
-    assertEquals("", Regexr.CtrlRemovr.replaceAll(ctrls));
-    assertEquals("", Regexr.CtrlRemovr.replaceAll(ctrlsR));
-
-    final String string = "PrettyfyMe.";
-    String uglified = "";
-    for (String ctrl : ctrls.split("")) {
-      // @formatter:off
-      uglified = Arrays.stream(string.split("")).collect(Collectors.joining(ctrl + ctrl + ctrl + ctrl + ctrl));
-      // @formatter:on
-      assertTrue(Character.isISOControl(ctrl.codePointAt(0)));
-      assertEquals(string, Regexr.CtrlRemovr.replaceAll(uglified));
-    }
-    uglified = Arrays.stream(string.split("")).collect(Collectors.joining(ctrls));
-    assertEquals(string, Regexr.CtrlRemovr.replaceAll(uglified));
-    uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(ctrlsR));
-    assertEquals(string, Regexr.CtrlRemovr.replaceAll(uglified));
-  }
-
-  @Test
-  public void testLinefeedLintr() {
-    assertEquals(new RegexrRecursive("\\s+\\n|\\n\\s+", "\n"), Regexr.LinefeedLintr);
-    assertEquals(1000, Regexr.LinefeedLintr.order());
-
-    final String string = "P\nr\ne\nt\nt\ny\nf\ny\nM\ne\n.";
-    String uglified = "";
-    String space = " \n  \n\n";
-    while (space.length() < 100000) {
-      uglified = Arrays.stream(string.split("\n")).collect(Collectors.joining(space += space));
-      assertEquals(string, Regexr.LinefeedLintr.replaceAll(uglified));
-    }
-  }
-
-  @Test
-  public void testSpaceLintr() {
-    assertEquals(new RegexrRecursive("[\\p{javaWhitespace}&&[^\\n]]{2,}", "\u0020"), Regexr.SpaceLintr);
-    assertEquals(100, Regexr.SpaceLintr.order());
-
-    final String string = "S h r i n k m e .";
-    String uglified = "";
-    String space = " ";
-    while (space.length() < 10000) {
-      uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(space));
-      assertEquals(string, Regexr.SpaceLintr.replaceAll(uglified));
-      space += space;
-    }
-  }
-
-  @Test
-  public void testSpaceNormalizr() {
-    assertEquals(new RegexrStandard("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", "\u0020"), Regexr.SpaceNormalizr);
-    assertEquals(10, Regexr.SpaceNormalizr.order());
-
-    String spaces = IntStream.rangeClosed(0, 200_000).filter(codePoint -> Character.isWhitespace(codePoint) || codePoint == 0x00A0).filter(codePoint -> codePoint != 0x000A && codePoint != 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String spacesR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.SpaceNormalizr.pattern().matcher(s).matches()).collect(Collectors.joining());
-    assertArrayEquals(spaces.codePoints().toArray(), spacesR.codePoints().toArray());
-    assertEquals(spaces, spacesR);
-    assertEquals(spaces.replaceAll("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", " "), Regexr.SpaceNormalizr.replaceAll(spaces));
-    assertEquals(spacesR.replaceAll("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", " "), Regexr.SpaceNormalizr.replaceAll(spacesR));
-
-    final String string = "N o r m a l i z e m e .";
-    String uglified = "";
-    for (String space : spaces.split("")) {
-      // @formatter:off
-      uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(space + space + space + space + space));
-      // @formatter:on
-      assertTrue(Integer.valueOf(space.codePointAt(0)).toString(), Character.isWhitespace(space.codePointAt(0)) || "\u00A0".equals(space));
-      assertEquals(Arrays.stream(string.split("\u0020")).collect(Collectors.joining("\u0020")), Regexr.SpaceNormalizr.replaceAll(uglified));
-    }
-    uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(spaces));
-    assertEquals(string, Regexr.SpaceNormalizr.replaceAll(uglified));
-    uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(spacesR));
-    assertEquals(string, Regexr.SpaceNormalizr.replaceAll(uglified));
-  }
-
-  @Test
-  public void testTrimr() {
-    assertEquals(new RegexrStandard("^[\\p{javaWhitespace}]+|[\\p{javaWhitespace}]+$", ""), Regexr.Trimr);
-    assertEquals(10000, Regexr.Trimr.order());
-
-    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
-    String whitespacesR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.Trimr.pattern.matcher(s).matches()).collect(Collectors.joining());
-    assertEquals(whitespaces, whitespacesR);
-    assertArrayEquals(whitespaces.codePoints().toArray(), whitespacesR.codePoints().toArray());
-    assertEquals("", Regexr.Trimr.replaceAll(whitespaces));
-    assertEquals("", Regexr.Trimr.replaceAll(whitespacesR));
-
-    final String string = "Trim me.";
-    String uglified = "";
-    for (String space : whitespacesR.split("")) {
-    // @formatter:off
-    uglified = new StringBuilder(string)
-      .insert(0, space + space + space + space + space)
-      .append(space + space + space + space + space)
-      .toString();
-    // @formatter:on
-      assertTrue(Character.isWhitespace(space.codePointAt(0)));
-      assertEquals(string, Regexr.Trimr.replaceAll(uglified));
-    }
-    do {
-      uglified = new StringBuilder(uglified).insert(0, whitespacesR).append(whitespacesR).toString();
-    } while (uglified.length() < 10000);
-    assertEquals(string, Regexr.Trimr.replaceAll(uglified));
-  }
-
-  @Test
-  public void testCjkNormalizr() {
+  void testCjkNormalizr() {
     assertEquals(100000, Regexr.CjkNormalizr.order());
     assertNull(Regexr.CjkNormalizr.replaceAll(null));
     assertEquals("", Regexr.CjkNormalizr.replaceAll(""));
 
     final Set<UnicodeBlock> unicodeBlocks = Arrays.asList(UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION, UnicodeBlock.HIRAGANA, UnicodeBlock.KATAKANA, UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS).stream().collect(Collectors.toSet());
     final Set<Integer> excludes = Arrays.asList(0xFF04, 0xFF5E, 0xFFE0, 0xFFE1, 0xFFE5, 0xFFE6).stream().collect(Collectors.toSet());
-    String halfwidthAndFullwidthForms = IntStream.rangeClosed(0, 200_000).filter(codePoint -> unicodeBlocks.contains(UnicodeBlock.of(codePoint))).filter(codePoint->!excludes.contains(codePoint)).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String halfwidthAndFullwidthForms = IntStream.rangeClosed(0, 200_000).filter(codePoint -> unicodeBlocks.contains(UnicodeBlock.of(codePoint))).filter(codePoint -> !excludes.contains(codePoint)).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
     String halfwidthAndFullwidthFormsR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.CjkNormalizr.pattern.matcher(s).matches()).collect(Collectors.joining());
     assertEquals(halfwidthAndFullwidthFormsR, halfwidthAndFullwidthForms);
     assertArrayEquals(halfwidthAndFullwidthFormsR.codePoints().toArray(), halfwidthAndFullwidthForms.codePoints().toArray());
@@ -322,7 +148,7 @@ public class RegexrTest {
 
     expect = "ァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロワワイエヲンヴカケヷヸヹヺ";
     assertEquals(expect, Regexr.CjkNormalizr.replaceAll(expect));
-    assertEquals(expect, Regexr.CjkNormalizr.replaceAll(Normalizer.normalize(expect, Form.NFD) ));
+    assertEquals(expect, Regexr.CjkNormalizr.replaceAll(Normalizer.normalize(expect, Form.NFD)));
 
     assertEquals("Hello World.", Regexr.CjkNormalizr.replaceAll("Hello World."));
     assertEquals("Hello World.", Regexr.CjkNormalizr.replaceAll("Ｈｅｌｌｏ　Ｗｏｒｌｄ．"));
@@ -341,8 +167,185 @@ public class RegexrTest {
   }
 
   @Test
-  public void testConstants() {
-    assertArrayEquals(new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr, Regexr.CjkNormalizr}, new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr, Regexr.CjkNormalizr});
-    assertArrayEquals(new Regexr[] {Regexr.CtrlRemovr, Regexr.SpaceNormalizr, Regexr.SpaceLintr, Regexr.LinefeedLintr, Regexr.Trimr, Regexr.CjkNormalizr}, Streamr.stream(new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.CjkNormalizr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr}).sorted().toArray(Regexr[]::new));
+  void testConstants() {
+    assertArrayEquals(new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr, Regexr.CjkNormalizr},
+        new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr, Regexr.CjkNormalizr});
+    assertArrayEquals(new Regexr[] {Regexr.CtrlRemovr, Regexr.SpaceNormalizr, Regexr.SpaceLintr, Regexr.LinefeedLintr, Regexr.Trimr, Regexr.CjkNormalizr},
+        Streamr.stream(new Regexr[] {Regexr.CtrlRemovr, Regexr.LinefeedLintr, Regexr.CjkNormalizr, Regexr.SpaceLintr, Regexr.SpaceNormalizr, Regexr.Trimr}).sorted().toArray(Regexr[]::new));
+  }
+
+  @Test
+  void testCtrlRemovr() {
+    assertEquals(new RegexrStandard("[\\p{Cc}&&[^\\s\\x{001C}-\\x{001F}]]", ""), Regexr.CtrlRemovr);
+    assertEquals(0, Regexr.CtrlRemovr.order());
+
+    String ctrls = IntStream.rangeClosed(0, 200_000).filter(Character::isISOControl).filter(((IntPredicate) Character::isWhitespace).negate()).filter(codePoint -> codePoint > 0x001C || codePoint < 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String ctrlsR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.CtrlRemovr.pattern.matcher(s).matches()).collect(Collectors.joining());
+    assertArrayEquals(ctrls.codePoints().toArray(), ctrlsR.codePoints().toArray());
+    assertEquals(ctrls, ctrlsR);
+    assertEquals("", Regexr.CtrlRemovr.replaceAll(ctrls));
+    assertEquals("", Regexr.CtrlRemovr.replaceAll(ctrlsR));
+
+    final String string = "PrettyfyMe.";
+    String uglified = "";
+    for (String ctrl : ctrls.split("")) {
+      // @formatter:off
+      uglified = Arrays.stream(string.split("")).collect(Collectors.joining(ctrl + ctrl + ctrl + ctrl + ctrl));
+      // @formatter:on
+      assertTrue(Character.isISOControl(ctrl.codePointAt(0)));
+      assertEquals(string, Regexr.CtrlRemovr.replaceAll(uglified));
+    }
+    uglified = Arrays.stream(string.split("")).collect(Collectors.joining(ctrls));
+    assertEquals(string, Regexr.CtrlRemovr.replaceAll(uglified));
+    uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(ctrlsR));
+    assertEquals(string, Regexr.CtrlRemovr.replaceAll(uglified));
+  }
+
+  @Test
+  void testFind() {
+    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find(null));
+    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find(""));
+    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find("1"));
+    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find("o ne"));
+    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find("One"));
+    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find("\t\t\to\tne\t\t\t"));
+    assertEquals(new ArrayList<>(), (new Regexr("one", "壱", 1) {}).find("\t\t\to\nne\t\t\t"));
+    assertEquals(Arrays.asList("one"), (new Regexr("one", "壱", 1) {}).find("one"));
+    assertEquals(Arrays.asList("one"), (new Regexr("one", "壱", 1) {}).find("one two three"));
+    assertEquals(Arrays.asList("one"), (new Regexr("one", "壱", 1) {}).find("three two one zero"));
+    assertEquals(Arrays.asList("one"), (new Regexr("one", "壱", 1) {}).find("three\ntwo\none\nzero"));
+    assertEquals(Arrays.asList("one", "one", "one", "one", "one"), (new Regexr("one", "壱", 1) {}).find("oneoneoneoneone"));
+    assertEquals(Arrays.asList("one", "one", "one", "one"), (new Regexr("one", "壱", 1) {}).find("neoneoneoneoneo"));
+    assertEquals(Arrays.asList("one"), (new Regexr("one", "壱", 1) {}).find("\t\t\tone\t\t\t"));
+    assertEquals(Arrays.asList("o\nne"), (new Regexr("o\\s?n\\s?e", "壱", 1) {}).find("\t\t\to\nne\t\t\t"));
+    assertEquals(Arrays.asList("o\nn\t\t\t\n\t\t\te"), (new Regexr("o\\s*n\\s*e", "壱", 1) {}).find("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"));
+    assertEquals(Arrays.asList("o", "n", "e"), (new Regexr("[one]", "壱", 1) {}).find("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"));
+  }
+
+  @Test
+  void testLinefeedLintr() {
+    assertEquals(new RegexrRecursive("\\s+\\n|\\n\\s+", "\n"), Regexr.LinefeedLintr);
+    assertEquals(1000, Regexr.LinefeedLintr.order());
+
+    final String string = "P\nr\ne\nt\nt\ny\nf\ny\nM\ne\n.";
+    String uglified = "";
+    String space = " \n  \n\n";
+    while (space.length() < 100000) {
+      uglified = Arrays.stream(string.split("\n")).collect(Collectors.joining(space += space));
+      assertEquals(string, Regexr.LinefeedLintr.replaceAll(uglified));
+    }
+  }
+
+  @Test
+  void testMatches() {
+    assertFalse((new Regexr("one", "壱", 1) {}).matches(null));
+    assertFalse((new Regexr("one", "壱", 1) {}).matches(""));
+    assertFalse((new Regexr("one", "壱", 1) {}).matches("1"));
+    assertFalse((new Regexr("one", "壱", 1) {}).matches("o ne"));
+    assertFalse((new Regexr("one", "壱", 1) {}).matches("One"));
+    assertFalse((new Regexr("one", "壱", 1) {}).matches("\t\t\to\tne\t\t\t"));
+    assertFalse((new Regexr("one", "壱", 1) {}).matches("\t\t\to\nne\t\t\t"));
+    assertTrue((new Regexr("one", "壱", 1) {}).matches("one"));
+    assertTrue((new Regexr("one", "壱", 1) {}).matches("one two three"));
+    assertTrue((new Regexr("one", "壱", 1) {}).matches("three two one zero"));
+    assertTrue((new Regexr("one", "壱", 1) {}).matches("three\ntwo\none\nzero"));
+    assertTrue((new Regexr("one", "壱", 1) {}).matches("oneoneoneoneone"));
+    assertTrue((new Regexr("one", "壱", 1) {}).matches("neoneoneoneoneo"));
+    assertTrue((new Regexr("one", "壱", 1) {}).matches("\t\t\tone\t\t\t"));
+    assertTrue((new Regexr("o\\s?n\\s?e", "壱", 1) {}).matches("\t\t\to\nne\t\t\t"));
+    assertTrue((new Regexr("o\\s*n\\s*e", "壱", 1) {}).matches("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"));
+  }
+
+  @Test
+  void testReplaceAll() {
+    assertNull((new Regexr("one", "壱", 1) {}).replaceAll(null));
+    assertEquals("", (new Regexr("one", "壱", 1) {}).replaceAll(""));
+    assertEquals("1", (new Regexr("one", "壱", 1) {}).replaceAll("1"));
+    assertEquals("o ne", (new Regexr("one", "壱", 1) {}).replaceAll("o ne"));
+    assertEquals("One", (new Regexr("one", "壱", 1) {}).replaceAll("One"));
+    assertEquals("壱", (new Regexr("[Oo]ne", "壱", 1) {}).replaceAll("One"));
+    assertEquals("\t\t\to\tne\t\t\t", (new Regexr("one", "壱", 1) {}).replaceAll("\t\t\to\tne\t\t\t"));
+    assertEquals("\t\t\to\nne\t\t\t", (new Regexr("one", "壱", 1) {}).replaceAll("\t\t\to\nne\t\t\t"));
+    assertEquals("壱", (new Regexr("one", "壱", 1) {}).replaceAll("one"));
+    assertEquals("壱 two three", (new Regexr("one", "壱", 1) {}).replaceAll("one two three"));
+    assertEquals("three two 壱 zero", (new Regexr("one", "壱", 1) {}).replaceAll("three two one zero"));
+    assertEquals("three\ntwo\n壱\nzero", (new Regexr("one", "壱", 1) {}).replaceAll("three\ntwo\none\nzero"));
+    assertEquals("壱壱壱壱壱", (new Regexr("one", "壱", 1) {}).replaceAll("oneoneoneoneone"));
+    assertEquals("ne壱壱壱壱o", (new Regexr("one", "壱", 1) {}).replaceAll("neoneoneoneoneo"));
+    assertEquals("\t\t\t壱\t\t\t", (new Regexr("one", "壱", 1) {}).replaceAll("\t\t\tone\t\t\t"));
+    assertEquals("\t\t\t壱\t\t\t", (new Regexr("o\\s?n\\s?e", "壱", 1) {}).replaceAll("\t\t\to\nne\t\t\t"));
+    assertEquals("\t\t\t壱\t\t\t", (new Regexr("o\\s*n\\s*e", "壱", 1) {}).replaceAll("\t\t\to\nn\t\t\t\n\t\t\te\t\t\t"));
+  }
+
+  @Test
+  void testSpaceLintr() {
+    assertEquals(new RegexrRecursive("[\\p{javaWhitespace}&&[^\\n]]{2,}", "\u0020"), Regexr.SpaceLintr);
+    assertEquals(100, Regexr.SpaceLintr.order());
+
+    final String string = "S h r i n k m e .";
+    String uglified = "";
+    String space = " ";
+    while (space.length() < 10000) {
+      uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(space));
+      assertEquals(string, Regexr.SpaceLintr.replaceAll(uglified));
+      space += space;
+    }
+  }
+
+  @Test
+  void testSpaceNormalizr() {
+    assertEquals(new RegexrStandard("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", "\u0020"), Regexr.SpaceNormalizr);
+    assertEquals(10, Regexr.SpaceNormalizr.order());
+
+    String spaces = IntStream.rangeClosed(0, 200_000).filter(codePoint -> Character.isWhitespace(codePoint) || codePoint == 0x00A0).filter(codePoint -> codePoint != 0x000A && codePoint != 0x0020).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String spacesR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.SpaceNormalizr.pattern().matcher(s).matches()).collect(Collectors.joining());
+    assertArrayEquals(spaces.codePoints().toArray(), spacesR.codePoints().toArray());
+    assertEquals(spaces, spacesR);
+    assertEquals(spaces.replaceAll("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", " "), Regexr.SpaceNormalizr.replaceAll(spaces));
+    assertEquals(spacesR.replaceAll("([[\\p{javaWhitespace}\u00A0]&&[^\\n\u0020]]+)", " "), Regexr.SpaceNormalizr.replaceAll(spacesR));
+
+    final String string = "N o r m a l i z e m e .";
+    String uglified = "";
+    for (String space : spaces.split("")) {
+      // @formatter:off
+      uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(space + space + space + space + space));
+      // @formatter:on
+      assertTrue(Character.isWhitespace(space.codePointAt(0)) || "\u00A0".equals(space));
+      assertEquals(Arrays.stream(string.split("\u0020")).collect(Collectors.joining("\u0020")), Regexr.SpaceNormalizr.replaceAll(uglified));
+    }
+    uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(spaces));
+    assertEquals(string, Regexr.SpaceNormalizr.replaceAll(uglified));
+    uglified = Arrays.stream(string.split("\u0020")).collect(Collectors.joining(spacesR));
+    assertEquals(string, Regexr.SpaceNormalizr.replaceAll(uglified));
+  }
+
+  @Test
+  void testTrimr() {
+    assertEquals(new RegexrStandard("^[\\p{javaWhitespace}]+|[\\p{javaWhitespace}]+$", ""), Regexr.Trimr);
+    assertEquals(10000, Regexr.Trimr.order());
+
+    String whitespaces = IntStream.rangeClosed(0, 200_000).filter(Character::isWhitespace).mapToObj(RegexrOrigin::newString).collect(Collectors.joining());
+    String whitespacesR = IntStream.rangeClosed(0, 200_000).mapToObj(RegexrOrigin::newString).filter(s -> Regexr.Trimr.pattern.matcher(s).matches()).collect(Collectors.joining());
+    assertEquals(whitespaces, whitespacesR);
+    assertArrayEquals(whitespaces.codePoints().toArray(), whitespacesR.codePoints().toArray());
+    assertEquals("", Regexr.Trimr.replaceAll(whitespaces));
+    assertEquals("", Regexr.Trimr.replaceAll(whitespacesR));
+
+    final String string = "Trim me.";
+    String uglified = "";
+    for (String space : whitespacesR.split("")) {
+    // @formatter:off
+    uglified = new StringBuilder(string)
+      .insert(0, space + space + space + space + space)
+      .append(space + space + space + space + space)
+      .toString();
+    // @formatter:on
+      assertTrue(Character.isWhitespace(space.codePointAt(0)));
+      assertEquals(string, Regexr.Trimr.replaceAll(uglified));
+    }
+    do {
+      uglified = new StringBuilder(uglified).insert(0, whitespacesR).append(whitespacesR).toString();
+    } while (uglified.length() < 10000);
+    assertEquals(string, Regexr.Trimr.replaceAll(uglified));
   }
 }

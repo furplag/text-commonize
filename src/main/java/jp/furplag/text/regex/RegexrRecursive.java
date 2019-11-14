@@ -26,18 +26,29 @@ import java.util.regex.Matcher;
  */
 public class RegexrRecursive extends Regexr {
 
+  /**
+   *
+   * @param regex the regular expression
+   * @param replacement The replacement string, set empty string if this parameter is null
+   */
   public RegexrRecursive(String regex, String replacement) {
     super(regex, replacement, 0);
   }
 
+  /**
+   *
+   * @param regex the regular expression
+   * @param replacement The replacement string, set empty string if this parameter is null
+   * @param order the order in replecing
+   */
   public RegexrRecursive(String regex, String replacement, int order) {
     super(regex, replacement, order);
   }
 
   /**
    * {@inheritDoc}
-   * <p>recursive {@link Matcher#replaceAll(String)}.</p>
-   * <p><b>Note: </b>be careful to infinity loop.</p>
+   * <p>recursive {@link Matcher#replaceAll(String)} .</p>
+   * <p><b>Note: </b>be careful to infinity loop .</p>
    *
    */
   @Override
