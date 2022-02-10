@@ -22,8 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import jp.furplag.sandbox.stream.Streamr;
 
 /**
  * for text linting .
@@ -69,28 +73,33 @@ public abstract class Regexr implements RegexrOrigin, Serializable, Comparable<R
     LinefeedLintr = new RegexrRecursive("\\s+\\n|\\n\\s+", "\n", 1_000);
     Trimr = new RegexrStandard("^[\\p{javaWhitespace}]+|[\\p{javaWhitespace}]+$", "", 10_000);
     CjkNormalizr = new Regexr("([\u3000-\u30FF\uFF00-\uFFEF&&[^\uFF5E\uFF04\uFFE0\uFFE1\uFFE5\uFFE6]]+)", "$1", 100_000) {
-      @Override
-      public String replaceAll(String string) {
-        // @formatter:off
-        if (RegexrOrigin.isEmpty(string)) {
-          return string;
-        }
-        String result = string
-          .replaceAll("[\u2010-\u2012]", "\u002D")
-          .replaceAll("\u0020?[\u3099\u309B]", "\uFF9E")
-          .replaceAll("\u0020?[\u309A\u309C]", "\uFF9F")
-        ;
-        Matcher matcher = pattern.matcher(result);
-        while (matcher.find()) {
-          String matched = matcher.group();
-          result = result.replace(matched, Normalizer.normalize(matched, Form.NFKC));
-        }
 
-        return result
-          .replaceAll("\u0020?([\u3099])", "\u309B")
-          .replaceAll("\u0020?([\u309A])", "\u309C");
-        // @formatter:on
-      }
+      private final UnaryOperator<String> _preNormalize = (t) -> RegexrOrigin.replaceAll(t
+        , new RegexrStandard("[\u2010-\u2012]", "\u002D", 1)
+        , new RegexrStandard("\u0020?[\u3099\u309B]", "\uFF9E", 2)
+        , new RegexrStandard("\u0020?[\u309A\u309C]", "\uFF9F", 3)
+      );
+      private final UnaryOperator<String> _normalize = (t) -> {
+        final AtomicReference<String> result = new AtomicReference<>(t);
+        pattern.matcher(result.get()).results().forEach((r) -> {
+          final String _r = r.group();
+          result.set(result.get().replace(_r, Normalizer.normalize(_r, Form.NFKC)));
+        });
+
+        return result.get();
+      };
+      private final UnaryOperator<String> _postNormalize = (t) -> RegexrOrigin.replaceAll(t
+        , new RegexrStandard("\u0020?([\u3099])", "\u309B", 1)
+        , new RegexrStandard("\u0020?([\u309A])", "\u309C", 2)
+      );
+
+      /** {@inheritDoc} */
+      @Override
+      public String replaceAll(final String text) {/* @formatter:off */
+        return Objects.toString(text, "").isEmpty() ? text : Streamr.stream(text)
+          .map(_preNormalize).map(_normalize).map(_postNormalize)
+          .findFirst().orElse(null);
+      /* @formatter:on */}
     };
   }
 

@@ -37,7 +37,7 @@ Add the following snippet to any project's pom that depends on your project
   <dependency>
     <groupId>jp.furplag.sandbox</groupId>
     <artifactId>text-commonize</artifactId>
-    <version>2.2.1-final</version>
+    <version>2.2.1-FINAL</version>
   </dependency>
 </dependencies>
 ```
